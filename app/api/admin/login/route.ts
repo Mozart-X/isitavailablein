@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyPassword, makeToken, ADMIN_COOKIE } from '@/lib/admin-auth';
 
+export const runtime = 'edge';
+
 export async function POST(req: NextRequest) {
   const form = await req.formData();
   const password = String(form.get('password') || '');

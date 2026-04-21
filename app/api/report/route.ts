@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { exec } from '@/lib/db';
-import crypto from 'node:crypto';
+
+export const runtime = 'edge';
+
+async function hashIp(ip: string): Promise<string> {
+  const salt = process.env.IP_SALT || 'default-salt';
+  const data = new TextEncoder().encode(ip + salt);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
+}
 
 export async function POST(req: NextRequest) {
   const form = await req.formData();
@@ -13,7 +21,7 @@ export async function POST(req: NextRequest) {
   }
 
   const ip = req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown';
-  const ip_hash = crypto.createHash('sha256').update(ip + (process.env.IP_SALT || 'default-salt')).digest('hex').slice(0, 16);
+  const ip_hash = await hashIp(ip);
 
   await exec(
     `INSERT INTO user_reports (service_id, country_iso2, reported_status, ip_hash) VALUES (?, ?, ?, ?)`,

@@ -6,6 +6,8 @@ const CYCLE: Record<string, string> = {
   yes: 'partial', partial: 'vpn_only', vpn_only: 'no', no: 'unknown', unknown: 'yes'
 };
 
+export const runtime = 'edge';
+
 export async function POST(req: NextRequest) {
   if (!(await verifyToken(req.cookies.get(ADMIN_COOKIE)?.value))) {
     return NextResponse.json({ ok: false }, { status: 401 });

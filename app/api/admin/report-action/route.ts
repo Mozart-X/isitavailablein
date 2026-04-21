@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken, ADMIN_COOKIE } from '@/lib/admin-auth';
 import { applyReport } from '@/lib/admin-db';
 
+export const runtime = 'edge';
+
 export async function POST(req: NextRequest) {
   if (!(await verifyToken(req.cookies.get(ADMIN_COOKIE)?.value))) {
     return NextResponse.json({ ok: false }, { status: 401 });

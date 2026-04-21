@@ -1,0 +1,32 @@
+{
+  "name": "isitavailablein",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "seed": "node scripts/seed.mjs",
+    "scrape": "node scripts/scrape-all.mjs",
+    "scrape:openai": "node scripts/scrapers/openai.mjs",
+    "scrape:anthropic": "node scripts/scrapers/anthropic.mjs",
+    "scrape:netflix": "node scripts/scrapers/netflix.mjs",
+    "scrape:spotify": "node scripts/scrapers/spotify.mjs",
+    "scrape:binance": "node scripts/scrapers/binance.mjs",
+    "scrape:coinbase": "node scripts/scrapers/coinbase.mjs",
+    "scrape:stripe": "node scripts/scrapers/stripe.mjs",
+    "scrape:uber": "node scripts/scrapers/uber.mjs",
+    "scrape:gemini": "node scripts/scrapers/gemini.mjs"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.14.0",
+    "next": "^14.2.33",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "@types/react": "^18.3.11",
+    "typescript": "^5.6.3"
+  }
+}

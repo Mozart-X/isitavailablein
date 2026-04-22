@@ -1,13 +1,12 @@
 // Admin-only DB helpers. Always fresh (no cache), for mutable views.
-import { createClient, type Client } from '@libsql/client';
-import path from 'node:path';
+import { createClient, type Client } from '@libsql/client/web';
 
 let _c: Client | null = null;
 function c(): Client {
   if (_c) return _c;
-  _c = process.env.TURSO_DATABASE_URL
-    ? createClient({ url: process.env.TURSO_DATABASE_URL, authToken: process.env.TURSO_AUTH_TOKEN })
-    : createClient({ url: `file:${path.join(process.cwd(), 'data.db')}` });
+  const url = process.env.TURSO_DATABASE_URL;
+  if (!url) throw new Error('TURSO_DATABASE_URL not set');
+  _c = createClient({ url, authToken: process.env.TURSO_AUTH_TOKEN });
   return _c;
 }
 

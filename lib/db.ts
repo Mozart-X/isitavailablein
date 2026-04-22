@@ -5,8 +5,7 @@
 // If you need fresh data on every request (e.g. for the /api/report endpoint
 // after a user submits), call exec() directly or clear the cache.
 
-import { createClient, type Client } from '@libsql/client';
-import path from 'node:path';
+import { createClient, type Client } from '@libsql/client/web';
 
 export type Status = 'yes' | 'no' | 'partial' | 'vpn_only' | 'unknown';
 
@@ -53,15 +52,12 @@ export type Change = {
 let _client: Client | null = null;
 function getClient(): Client {
   if (_client) return _client;
-  if (process.env.TURSO_DATABASE_URL) {
-    _client = createClient({
-      url: process.env.TURSO_DATABASE_URL,
-      authToken: process.env.TURSO_AUTH_TOKEN
-    });
-  } else {
-    const p = path.join(process.cwd(), 'data.db');
-    _client = createClient({ url: `file:${p}` });
-  }
+  const url = process.env.TURSO_DATABASE_URL;
+  if (!url) throw new Error('TURSO_DATABASE_URL not set');
+  _client = createClient({
+    url,
+    authToken: process.env.TURSO_AUTH_TOKEN
+  });
   return _client;
 }
 

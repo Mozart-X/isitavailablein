@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { recentScrapes } from '@/lib/admin-db';
 
 export const dynamic = 'force-dynamic';

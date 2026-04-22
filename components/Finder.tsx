@@ -24,20 +24,6 @@ export default function Finder({ services, countries }: { services: Lite[]; coun
   const [focusIdx, setFocusIdx] = useState(0);
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  // Auto-detect country from browser locale on first paint.
-  useEffect(() => {
-    if (country) return;
-    try {
-      const loc = (navigator.languages?.[0] || navigator.language || '').toLowerCase();
-      const region = loc.split('-')[1]?.toUpperCase();
-      if (region) {
-        const match = countries.find((c) => c.iso2 === region);
-        if (match) setCountry(match.slug);
-      }
-    } catch { /* noop */ }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   // Close dropdown on outside click.
   useEffect(() => {
     function onDoc(e: MouseEvent) {
@@ -50,25 +36,26 @@ export default function Finder({ services, countries }: { services: Lite[]; coun
   const suggestions = useMemo<Suggestion[]>(() => {
     const needle = q.trim().toLowerCase();
     if (!needle) return [];
-    const svc: Suggestion[] = services
-      .filter((s) => s.name.toLowerCase().includes(needle) || s.slug.includes(needle))
-      .slice(0, 6)
-      .map((s) => ({ kind: 'service', slug: s.slug, label: s.name, sub: s.category }));
-    const ctry: Suggestion[] = countries
-      .filter((c) => c.name.toLowerCase().includes(needle) || c.slug.includes(needle))
-      .slice(0, 6)
-      .map((c) => ({ kind: 'country', slug: c.slug, label: `${c.flag || ''} ${c.name}`.trim() }));
-    // Interleave service-first
-    return [...svc, ...ctry].slice(0, 8);
+    const rank = (name: string, slug: string): number => {
+      const n = name.toLowerCase();
+      if (n === needle || slug === needle) return 0;
+      if (n.startsWith(needle) || slug.startsWith(needle)) return 1;
+      if (n.includes(needle) || slug.includes(needle)) return 2;
+      return 99;
+    };
+    const svc: Array<{ r: number; s: Suggestion }> = services
+      .map((s) => ({ r: rank(s.name, s.slug), s: { kind: 'service' as const, slug: s.slug, label: s.name, sub: s.category } }))
+      .filter((x) => x.r < 99);
+    const ctry: Array<{ r: number; s: Suggestion }> = countries
+      .map((c) => ({ r: rank(c.name, c.slug), s: { kind: 'country' as const, slug: c.slug, label: `${c.flag || ''} ${c.name}`.trim() } }))
+      .filter((x) => x.r < 99);
+    return [...svc, ...ctry].sort((a, b) => a.r - b.r).slice(0, 10).map((x) => x.s);
   }, [q, services, countries]);
 
   function go(sug: Suggestion) {
-    const hasSvc = sug.kind === 'service' ? sug.slug : service;
-    const hasCtry = sug.kind === 'country' ? sug.slug : country;
-    let href = '';
-    if (hasSvc && hasCtry) href = `/${buildAvailabilitySlug(hasSvc, hasCtry)}`;
-    else if (sug.kind === 'service') href = `/service/${sug.slug}`;
-    else href = `/country/${sug.slug}`;
+    // Clicking a suggestion always navigates to that single entity's page.
+    // Users combine service+country via the selects below, not by typing.
+    const href = sug.kind === 'service' ? `/service/${sug.slug}` : `/country/${sug.slug}`;
     window.location.href = href;
   }
 
@@ -100,6 +87,14 @@ export default function Finder({ services, countries }: { services: Lite[]; coun
           }}
           autoComplete="off"
         />
+        {open && q.trim() && suggestions.length === 0 && (
+          <ul className="finder-suggestions" role="listbox">
+            <li style={{ color: '#888', cursor: 'default' }}>
+              <span className="kind">—</span>
+              <span className="label">No match. Try a different spelling or browse <a href="/services">all services</a>.</span>
+            </li>
+          </ul>
+        )}
         {open && suggestions.length > 0 && (
           <ul className="finder-suggestions" role="listbox">
             {suggestions.map((s, i) => (

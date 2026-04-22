@@ -37,6 +37,35 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           />
         )}
         <link rel="alternate" type="application/rss+xml" title="Recent availability changes" href="/changes/rss.xml" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@graph': [
+                {
+                  '@type': 'WebSite',
+                  '@id': 'https://isitavailablein.com/#website',
+                  url: 'https://isitavailablein.com/',
+                  name: 'IsItAvailableIn',
+                  description: 'Check if online services are available in your country, with local pricing and workarounds.',
+                  potentialAction: {
+                    '@type': 'SearchAction',
+                    target: 'https://isitavailablein.com/search?q={search_term_string}',
+                    'query-input': 'required name=search_term_string'
+                  }
+                },
+                {
+                  '@type': 'Organization',
+                  '@id': 'https://isitavailablein.com/#org',
+                  name: 'IsItAvailableIn',
+                  url: 'https://isitavailablein.com/',
+                  logo: 'https://isitavailablein.com/icon.svg'
+                }
+              ]
+            })
+          }}
+        />
       </head>
       <body>
         <header className="site-header">

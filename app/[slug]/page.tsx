@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getAllServices, getAllCountries, getService, getCountry, getAvailability, getPricing } from '@/lib/db';
+import { getAllServices, getAllCountries, getService, getCountry, getAvailability, getPricing, getAvailabilityForCountry } from '@/lib/db';
 import { parseAvailabilitySlug, buildAvailabilitySlug, statusAnswer } from '@/lib/url';
 import { vpnLink } from '@/lib/affiliate';
 import AdSlot from '@/components/AdSlot';
@@ -23,11 +23,16 @@ async function resolve(slug: string) {
   if (!parsed) return null;
   const [service, country] = await Promise.all([getService(parsed.service), getCountry(parsed.country)]);
   if (!service || !country) return null;
-  const [avail, pricing] = await Promise.all([
+  const [avail, pricing, sameCountry] = await Promise.all([
     getAvailability(service.id, country.iso2),
-    getPricing(service.id, country.iso2)
+    getPricing(service.id, country.iso2),
+    getAvailabilityForCountry(country.iso2)
   ]);
-  return { service, country, avail, pricing };
+  // Alternatives: same category, works in this country, excluding current.
+  const alternatives = sameCountry
+    .filter((x) => x.category === service.category && x.service_slug !== service.slug && x.status === 'yes')
+    .slice(0, 6);
+  return { service, country, avail, pricing, alternatives };
 }
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
@@ -49,7 +54,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function Page({ params }: { params: { slug: string } }) {
   const r = await resolve(params.slug);
   if (!r) notFound();
-  const { service, country, avail, pricing } = r;
+  const { service, country, avail, pricing, alternatives } = r;
   const status = avail?.status || 'unknown';
   const ans = statusAnswer(status);
   const isUnavailable = status === 'no' || status === 'vpn_only';
@@ -195,9 +200,24 @@ export default async function Page({ params }: { params: { slug: string } }) {
 
       <AdSlot slot="answer-bottom" style={{ minHeight: 250 }} />
 
+      {isUnavailable && alternatives.length > 0 && (
+        <>
+          <h2>Alternatives that work in {country.name}</h2>
+          <div className="grid">
+            {alternatives.map((alt) => (
+              <a key={alt.service_slug} href={`/is-${alt.service_slug}-available-in-${country.slug}`}>
+                <span>{alt.service_name}</span>
+                <span className="status-badge status-yes">Yes</span>
+              </a>
+            ))}
+          </div>
+        </>
+      )}
+
       <h2>Related</h2>
       <div className="grid">
         <a href={`/service/${service.slug}`}>All countries for {service.name}</a>
+        <a href={`/service/${service.slug}/price`}>Price by country for {service.name}</a>
         <a href={`/country/${country.slug}`}>All services in {country.name}</a>
       </div>
     </article>

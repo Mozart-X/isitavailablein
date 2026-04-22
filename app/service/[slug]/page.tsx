@@ -34,7 +34,11 @@ export default async function Page({ params }: { params: { slug: string } }) {
     <article>
       <h1>Where is {s.name} available?</h1>
       <p><span className="category-tag">{s.category}</span> {s.description}</p>
-      <p><a href={s.official_url} rel="nofollow" target="_blank">Official site ↗</a></p>
+      <p>
+        <a href={s.official_url} rel="nofollow" target="_blank">Official site ↗</a>
+        {' · '}
+        <a href={`/service/${s.slug}/price`}>Price by country →</a>
+      </p>
 
       {no.length > 0 && (
         <>

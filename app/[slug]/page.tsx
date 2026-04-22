@@ -3,6 +3,7 @@ import { getAllServices, getAllCountries, getService, getCountry, getAvailabilit
 import { parseAvailabilitySlug, buildAvailabilitySlug, statusAnswer } from '@/lib/url';
 import { vpnLink } from '@/lib/affiliate';
 import AdSlot from '@/components/AdSlot';
+import PriceTable from '@/components/PriceTable';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
@@ -159,20 +160,19 @@ export default async function Page({ params }: { params: { slug: string } }) {
       {pricing && pricing.length > 0 && (
         <>
           <h2>Price in {country.name}</h2>
-          <table className="price-table">
-            <thead><tr><th>Tier</th><th>Local price</th><th>USD</th><th>Period</th></tr></thead>
-            <tbody>
-              {pricing.map((p) => (
-                <tr key={p.tier}>
-                  <td>{p.tier}</td>
-                  <td>{p.price_local != null ? `${p.price_local} ${p.currency_local || ''}` : '—'}</td>
-                  <td className="price-usd">{p.price_usd != null ? `$${p.price_usd.toFixed(2)}` : '—'}</td>
-                  <td>/{p.period || 'month'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <p style={{ fontSize: '0.85rem', color: '#666' }}>Prices shown in local currency where available. USD conversions are approximate.</p>
+          <PriceTable
+            rows={pricing.map((p) => ({
+              country_iso2: country.iso2,
+              tier: p.tier,
+              price_local: p.price_local,
+              currency_local: p.currency_local,
+              price_usd: p.price_usd,
+              period: p.period,
+            }))}
+            serviceSlug={service.slug}
+            showCountry={false}
+            caption={pricing.length === 1 ? pricing[0].tier : undefined}
+          />
         </>
       )}
 

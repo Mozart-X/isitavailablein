@@ -17,6 +17,7 @@ export const metadata: Metadata = {
 const ADSENSE = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 const PLAUSIBLE = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID; // e.g. G-XXXXXXXXXX
+const CF_BEACON = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN; // Cloudflare Web Analytics token
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -35,6 +36,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             defer
             data-domain={PLAUSIBLE}
             src="https://plausible.io/js/script.js"
+          />
+        )}
+        {CF_BEACON && (
+          <Script
+            defer
+            strategy="afterInteractive"
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon={`{"token": "${CF_BEACON}"}`}
           />
         )}
         {GA_ID && (

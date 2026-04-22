@@ -36,6 +36,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             src="https://plausible.io/js/script.js"
           />
         )}
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
         <link rel="alternate" type="application/rss+xml" title="Recent availability changes" href="/changes/rss.xml" />
         <script
           type="application/ld+json"

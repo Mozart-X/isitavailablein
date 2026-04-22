@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 
 const ADSENSE = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 const PLAUSIBLE = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID; // e.g. G-XXXXXXXXXX
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -35,6 +36,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             data-domain={PLAUSIBLE}
             src="https://plausible.io/js/script.js"
           />
+        )}
+        {GA_ID && (
+          <>
+            <Script
+              async
+              strategy="afterInteractive"
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+            />
+            <Script
+              id="ga4-init"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}',{anonymize_ip:true});`
+              }}
+            />
+          </>
         )}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />

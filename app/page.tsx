@@ -21,7 +21,7 @@ export default async function HomePage() {
     <>
       <section className="hero">
         <h1>Can I use it from my country?</h1>
-        <p>Availability, local price, signup friction, and workarounds for {services.length}+ online services across {countries.length} countries. Updated every 2 hours.</p>
+        <p>Availability, local price, signup friction, and workarounds for {services.length}+ online services across {countries.length} countries.</p>
         <Finder
           services={services.map((s) => ({ slug: s.slug, name: s.name, category: s.category }))}
           countries={countries.map((c) => ({ slug: c.slug, name: c.name, iso2: c.iso2, flag: c.flag }))}

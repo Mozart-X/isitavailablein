@@ -3,6 +3,7 @@ import { getAllServices, getService, getPricingForService, getAllCountries } fro
 import PriceTable from '@/components/PriceTable';
 import type { Metadata } from 'next';
 
+export const runtime = 'edge';
 export const revalidate = 3600;
 
 export async function generateStaticParams() {

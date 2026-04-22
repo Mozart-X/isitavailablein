@@ -18,23 +18,27 @@ export async function run(sql: string, args: any[] = []) {
   await c().execute({ sql, args });
 }
 
+async function countOr0(sql: string): Promise<number> {
+  try {
+    const rows = await q(sql);
+    return Number(rows[0]?.n ?? 0);
+  } catch {
+    return 0;
+  }
+}
+
 export async function adminStats() {
-  const [svc, ctry, av, r, cl, sl] = await Promise.all([
-    q('SELECT COUNT(*) as n FROM services'),
-    q('SELECT COUNT(*) as n FROM countries'),
-    q('SELECT COUNT(*) as n FROM availability'),
-    q('SELECT COUNT(*) as n FROM user_reports WHERE reviewed = 0'),
-    q('SELECT COUNT(*) as n FROM change_log'),
-    q('SELECT COUNT(*) as n FROM scrape_log WHERE ok = 0 AND run_at > datetime("now","-7 days")')
-  ]);
-  return {
-    services: Number(svc[0].n),
-    countries: Number(ctry[0].n),
-    availability: Number(av[0].n),
-    pendingReports: Number(r[0].n),
-    changes: Number(cl[0].n),
-    recentFailedScrapes: Number(sl[0].n)
-  };
+  const [services, countries, availability, pendingReports, changes, recentFailedScrapes, pendingSuggestions] =
+    await Promise.all([
+      countOr0('SELECT COUNT(*) as n FROM services'),
+      countOr0('SELECT COUNT(*) as n FROM countries'),
+      countOr0('SELECT COUNT(*) as n FROM availability'),
+      countOr0('SELECT COUNT(*) as n FROM user_reports WHERE reviewed = 0'),
+      countOr0('SELECT COUNT(*) as n FROM change_log'),
+      countOr0('SELECT COUNT(*) as n FROM scrape_log WHERE ok = 0 AND run_at > datetime("now","-7 days")'),
+      countOr0('SELECT COUNT(*) as n FROM suggestions WHERE reviewed = 0')
+    ]);
+  return { services, countries, availability, pendingReports, changes, recentFailedScrapes, pendingSuggestions };
 }
 
 export async function pendingReports() {
@@ -51,6 +55,18 @@ export async function pendingReports() {
 
 export async function recentScrapes(limit = 50) {
   return q('SELECT * FROM scrape_log ORDER BY run_at DESC LIMIT ?', [limit]);
+}
+
+export async function listSuggestions(limit = 200) {
+  try {
+    return await q('SELECT * FROM suggestions ORDER BY created_at DESC LIMIT ?', [limit]);
+  } catch {
+    return [];
+  }
+}
+
+export async function markSuggestionReviewed(id: number) {
+  await run('UPDATE suggestions SET reviewed = 1 WHERE id = ?', [id]);
 }
 
 export async function applyReport(reportId: number, apply: boolean) {

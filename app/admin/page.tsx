@@ -12,7 +12,8 @@ export default async function AdminHome() {
     ['Availability rows', s.availability, ''],
     ['Pending reports', s.pendingReports, '/admin/reports'],
     ['Total changes logged', s.changes, '/changes'],
-    ['Failed scrapes (7d)', s.recentFailedScrapes, '/admin/scrape-log']
+    ['Failed scrapes (7d)', s.recentFailedScrapes, '/admin/scrape-log'],
+    ['Pending suggestions', s.pendingSuggestions, '/admin/suggestions']
   ];
   return (
     <>

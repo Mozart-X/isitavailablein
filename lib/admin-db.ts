@@ -79,6 +79,58 @@ export async function applyReport(reportId: number, apply: boolean) {
   }
 }
 
+export async function setDetails(serviceId: number, iso2: string, d: {
+  payment_ok?: string | null; phone_verify_ok?: string | null;
+  signup_friction?: string | null; workaround?: string | null;
+}) {
+  const validYN = ['yes','no','workaround','unknown',''];
+  const validFr = ['easy','medium','hard','blocked','unknown',''];
+  const norm = (v: any, set: string[]) => {
+    const s = (v ?? '').toString().trim().toLowerCase();
+    if (!set.includes(s)) return null;
+    return s || null;
+  };
+  const payment = norm(d.payment_ok, validYN);
+  const phone = norm(d.phone_verify_ok, validYN);
+  const friction = norm(d.signup_friction, validFr);
+  const workaround = (d.workaround ?? '').toString().trim() || null;
+  const today = new Date().toISOString().slice(0, 10);
+  // Ensure row exists (status=unknown if missing) then update detail columns.
+  await run(
+    `INSERT INTO availability (service_id, country_iso2, status, source, last_verified, payment_ok, phone_verify_ok, signup_friction, workaround)
+     VALUES (?, ?, 'unknown', 'admin-manual', ?, ?, ?, ?, ?)
+     ON CONFLICT(service_id, country_iso2) DO UPDATE SET
+       payment_ok=excluded.payment_ok,
+       phone_verify_ok=excluded.phone_verify_ok,
+       signup_friction=excluded.signup_friction,
+       workaround=excluded.workaround`,
+    [serviceId, iso2, today, payment, phone, friction, workaround]
+  );
+}
+
+export async function setPricing(serviceId: number, iso2: string, tier: string, p: {
+  price_local?: number | null; currency_local?: string | null;
+  price_usd?: number | null; period?: string | null;
+}) {
+  const t = (tier || 'standard').toString().trim().toLowerCase() || 'standard';
+  const priceLocal = p.price_local != null && !isNaN(Number(p.price_local)) ? Number(p.price_local) : null;
+  const priceUsd = p.price_usd != null && !isNaN(Number(p.price_usd)) ? Number(p.price_usd) : null;
+  const cur = (p.currency_local ?? '').toString().trim().toUpperCase() || null;
+  const period = (p.period ?? 'month').toString().trim().toLowerCase() || 'month';
+  await run(
+    `INSERT INTO pricing (service_id, country_iso2, tier, price_local, currency_local, price_usd, period, source, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, 'admin-manual', datetime('now'))
+     ON CONFLICT(service_id, country_iso2, tier) DO UPDATE SET
+       price_local=excluded.price_local,
+       currency_local=excluded.currency_local,
+       price_usd=excluded.price_usd,
+       period=excluded.period,
+       source=excluded.source,
+       updated_at=excluded.updated_at`,
+    [serviceId, iso2, t, priceLocal, cur, priceUsd, period]
+  );
+}
+
 export async function setStatus(serviceId: number, iso2: string, status: string, note: string | null) {
   const valid = ['yes', 'no', 'partial', 'vpn_only', 'unknown'];
   if (!valid.includes(status)) throw new Error('bad status');

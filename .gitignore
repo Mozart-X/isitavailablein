@@ -6,3 +6,5 @@ out
 *.db
 *.db-journal
 .DS_Store
+.claude/
+tsconfig.tsbuildinfo

@@ -26,6 +26,9 @@ export type Country = {
   flag: string;
 };
 
+export type YesNoWorkaround = 'yes' | 'no' | 'workaround' | 'unknown' | null;
+export type SignupFriction = 'easy' | 'medium' | 'hard' | 'blocked' | 'unknown' | null;
+
 export type Availability = {
   service_id: number;
   country_iso2: string;
@@ -33,6 +36,22 @@ export type Availability = {
   source: string | null;
   notes: string | null;
   last_verified: string;
+  payment_ok: YesNoWorkaround;
+  phone_verify_ok: YesNoWorkaround;
+  signup_friction: SignupFriction;
+  workaround: string | null;
+};
+
+export type Pricing = {
+  service_id: number;
+  country_iso2: string;
+  tier: string;
+  price_local: number | null;
+  currency_local: string | null;
+  price_usd: number | null;
+  period: string | null;
+  source: string | null;
+  updated_at: string;
 };
 
 export type Change = {
@@ -66,6 +85,7 @@ type Cache = {
   countries: Country[];
   availability: Availability[];
   changes: Change[];
+  pricing: Pricing[];
   serviceBySlug: Map<string, Service>;
   serviceById: Map<number, Service>;
   countryBySlug: Map<string, Country>;
@@ -73,6 +93,7 @@ type Cache = {
   availByKey: Map<string, Availability>; // `${serviceId}|${iso2}`
   availBySvc: Map<number, Availability[]>;
   availByCountry: Map<string, Availability[]>;
+  priceByKey: Map<string, Pricing[]>; // `${serviceId}|${iso2}` -> tiers
 };
 
 let _cache: Cache | null = null;
@@ -83,6 +104,8 @@ const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes — keeps site fresh without re
 async function load(): Promise<Cache> {
   const c = getClient();
 
+  // `pricing` may not exist yet on older DBs — guard with try/catch.
+  let pricing: Pricing[] = [];
   const [svcRes, ctryRes, avRes, clRes] = await Promise.all([
     c.execute('SELECT * FROM services ORDER BY name'),
     c.execute('SELECT * FROM countries ORDER BY name'),
@@ -94,6 +117,10 @@ async function load(): Promise<Cache> {
                JOIN countries co ON cl.country_iso2 = co.iso2
                ORDER BY cl.changed_at DESC LIMIT 200`)
   ]);
+  try {
+    const pRes = await c.execute('SELECT * FROM pricing');
+    pricing = pRes.rows as unknown as Pricing[];
+  } catch { /* table may not exist before migration */ }
 
   const services = svcRes.rows as unknown as Service[];
   const countries = ctryRes.rows as unknown as Country[];
@@ -120,10 +147,22 @@ async function load(): Promise<Cache> {
     availByCountry.get(a.country_iso2)!.push(a);
   }
 
+  pricing.forEach((p) => {
+    p.service_id = Number(p.service_id);
+    if (p.price_local != null) p.price_local = Number(p.price_local);
+    if (p.price_usd != null) p.price_usd = Number(p.price_usd);
+  });
+  const priceByKey = new Map<string, Pricing[]>();
+  for (const p of pricing) {
+    const k = `${p.service_id}|${p.country_iso2}`;
+    if (!priceByKey.has(k)) priceByKey.set(k, []);
+    priceByKey.get(k)!.push(p);
+  }
+
   return {
-    services, countries, availability, changes,
+    services, countries, availability, changes, pricing,
     serviceBySlug, serviceById, countryBySlug, countryByIso,
-    availByKey, availBySvc, availByCountry
+    availByKey, availBySvc, availByCountry, priceByKey
   };
 }
 
@@ -176,6 +215,14 @@ export async function getAvailabilityForCountry(iso2: string): Promise<(Availabi
 
 export async function getRecentChanges(limit = 30): Promise<Change[]> {
   return (await cache()).changes.slice(0, limit);
+}
+
+export async function getPricing(serviceId: number, iso2: string): Promise<Pricing[]> {
+  return (await cache()).priceByKey.get(`${serviceId}|${iso2}`) ?? [];
+}
+
+export async function getPricingForService(serviceId: number): Promise<Pricing[]> {
+  return (await cache()).pricing.filter((p) => p.service_id === serviceId);
 }
 
 // Direct DB writes (bypass cache). Used by /api/report.

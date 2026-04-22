@@ -1,81 +1,73 @@
 import { getAllServices, getAllCountries, getRecentChanges } from '@/lib/db';
 import { buildAvailabilitySlug } from '@/lib/url';
+import Finder from '@/components/Finder';
 
 export const revalidate = 3600;
+
+const POPULAR_SERVICES = ['chatgpt', 'claude', 'netflix', 'spotify', 'revolut', 'binance'];
+const POPULAR_COUNTRIES = ['united-states', 'united-kingdom', 'india', 'nepal', 'germany', 'brazil'];
 
 export default async function HomePage() {
   const [services, countries, changes] = await Promise.all([
     getAllServices(),
     getAllCountries(),
-    getRecentChanges(10)
+    getRecentChanges(8)
   ]);
 
-  const categories = [...new Set(services.map((s) => s.category))];
+  const popSvc = POPULAR_SERVICES.map((s) => services.find((x) => x.slug === s)).filter(Boolean) as typeof services;
+  const popCtry = POPULAR_COUNTRIES.map((s) => countries.find((x) => x.slug === s)).filter(Boolean) as typeof countries;
 
   return (
     <>
       <section className="hero">
-        <h1>Is it available in my country?</h1>
-        <p>Check whether ChatGPT, Netflix, Revolut, Binance and {services.length}+ services work in your country. Updated daily from official sources.</p>
+        <h1>Can I use it from my country?</h1>
+        <p>Availability, local price, signup friction, and workarounds for {services.length}+ online services across {countries.length} countries. Updated every 2 hours.</p>
+        <Finder
+          services={services.map((s) => ({ slug: s.slug, name: s.name, category: s.category }))}
+          countries={countries.map((c) => ({ slug: c.slug, name: c.name, iso2: c.iso2, flag: c.flag }))}
+        />
       </section>
 
-      <h2>Popular checks</h2>
-      <div className="grid">
-        {services.slice(0, 12).flatMap((s) =>
-          ['US', 'GB', 'NP', 'IN'].map((iso) => {
-            const c = countries.find((x) => x.iso2 === iso);
-            if (!c) return null;
-            return (
+      <section>
+        <h2>Popular checks</h2>
+        <div className="grid">
+          {popSvc.flatMap((s) =>
+            popCtry.map((c) => (
               <a key={`${s.slug}-${c.slug}`} href={`/${buildAvailabilitySlug(s.slug, c.slug)}`}>
-                <span>Is {s.name} in {c.name}?</span>
-                <span>{c.flag}</span>
-              </a>
-            );
-          })
-        )}
-      </div>
-
-      <h2>Browse by category</h2>
-      {categories.map((cat) => (
-        <div key={cat} style={{ marginBottom: '2rem' }}>
-          <h3><span className="category-tag">{cat}</span></h3>
-          <div className="grid">
-            {services.filter((s) => s.category === cat).map((s) => (
-              <a key={s.slug} href={`/service/${s.slug}`}>
-                <span>{s.name}</span>
+                <span>{s.name} <small>in</small> {c.flag} {c.name}</span>
                 <span>→</span>
               </a>
-            ))}
-          </div>
+            ))
+          )}
         </div>
-      ))}
+      </section>
 
-      <h2>Recent changes</h2>
-      {changes.length === 0 ? <p>No changes logged yet.</p> : (
-        <table>
-          <thead><tr><th>When</th><th>Service</th><th>Country</th><th>Change</th></tr></thead>
-          <tbody>
-            {changes.map((c: any) => (
-              <tr key={c.id}>
-                <td>{new Date(c.changed_at).toLocaleDateString()}</td>
-                <td><a href={`/service/${c.service_slug}`}>{c.service_name}</a></td>
-                <td><a href={`/country/${c.country_slug}`}>{c.country_name}</a></td>
-                <td><span className={`status-badge status-${c.old_status}`}>{c.old_status || '—'}</span> → <span className={`status-badge status-${c.new_status}`}>{c.new_status}</span></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+      <section>
+        <h2>Recent status changes</h2>
+        {changes.length === 0 ? <p>No changes logged yet.</p> : (
+          <table>
+            <thead><tr><th>When</th><th>Service</th><th>Country</th><th>Change</th></tr></thead>
+            <tbody>
+              {changes.map((c: any) => (
+                <tr key={c.id}>
+                  <td>{new Date(c.changed_at).toLocaleDateString()}</td>
+                  <td><a href={`/service/${c.service_slug}`}>{c.service_name}</a></td>
+                  <td><a href={`/country/${c.country_slug}`}>{c.country_name}</a></td>
+                  <td><span className={`status-badge status-${c.old_status}`}>{c.old_status || '—'}</span> → <span className={`status-badge status-${c.new_status}`}>{c.new_status}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        <p><a href="/changes">See all changes →</a></p>
+      </section>
 
-      <h2>Browse by country</h2>
-      <div className="grid">
-        {countries.map((c) => (
-          <a key={c.iso2} href={`/country/${c.slug}`}>
-            <span>{c.flag} {c.name}</span>
-            <span>→</span>
-          </a>
-        ))}
-      </div>
+      <section>
+        <h2>Browse all</h2>
+        <p>
+          <a href="/services">All {services.length} services</a> · <a href="/countries">All {countries.length} countries</a>
+        </p>
+      </section>
     </>
   );
 }

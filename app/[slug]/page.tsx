@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getAllServices, getAllCountries, getService, getCountry, getAvailability } from '@/lib/db';
+import { getAllServices, getAllCountries, getService, getCountry, getAvailability, getPricing } from '@/lib/db';
 import { parseAvailabilitySlug, buildAvailabilitySlug, statusAnswer } from '@/lib/url';
 import { vpnLink } from '@/lib/affiliate';
 import AdSlot from '@/components/AdSlot';
@@ -23,8 +23,11 @@ async function resolve(slug: string) {
   if (!parsed) return null;
   const [service, country] = await Promise.all([getService(parsed.service), getCountry(parsed.country)]);
   if (!service || !country) return null;
-  const avail = await getAvailability(service.id, country.iso2);
-  return { service, country, avail };
+  const [avail, pricing] = await Promise.all([
+    getAvailability(service.id, country.iso2),
+    getPricing(service.id, country.iso2)
+  ]);
+  return { service, country, avail, pricing };
 }
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
@@ -46,10 +49,24 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function Page({ params }: { params: { slug: string } }) {
   const r = await resolve(params.slug);
   if (!r) notFound();
-  const { service, country, avail } = r;
+  const { service, country, avail, pricing } = r;
   const status = avail?.status || 'unknown';
   const ans = statusAnswer(status);
   const isUnavailable = status === 'no' || status === 'vpn_only';
+
+  const friction = avail?.signup_friction;
+  const payOk = avail?.payment_ok;
+  const phoneOk = avail?.phone_verify_ok;
+  const hasAnyDetail = friction || payOk || phoneOk || avail?.workaround || (pricing && pricing.length);
+
+  const tag = (v: string | null | undefined) => {
+    if (!v || v === 'unknown') return { word: 'Unknown', className: 'status-unknown' };
+    if (v === 'yes' || v === 'easy') return { word: v === 'yes' ? 'Yes' : 'Easy', className: 'status-yes' };
+    if (v === 'no' || v === 'blocked') return { word: v === 'no' ? 'No' : 'Blocked', className: 'status-no' };
+    if (v === 'workaround' || v === 'hard') return { word: v === 'workaround' ? 'Workaround' : 'Hard', className: 'status-vpn_only' };
+    if (v === 'medium') return { word: 'Medium', className: 'status-partial' };
+    return { word: v, className: 'status-unknown' };
+  };
   const vpn = vpnLink('nord');
 
   const jsonLd = {
@@ -98,6 +115,60 @@ export default async function Page({ params }: { params: { slug: string } }) {
           </div>
           <a href={vpn.href} rel="nofollow sponsored" target="_blank">{vpn.label} →</a>
         </div>
+      )}
+
+      {hasAnyDetail && (
+        <>
+          <h2>Details for {country.name}</h2>
+          <div className="info-grid">
+            {friction && (
+              <div className="info-card">
+                <div className="label">Signup friction</div>
+                <div className="value"><span className={`status-badge ${tag(friction).className}`}>{tag(friction).word}</span></div>
+              </div>
+            )}
+            {payOk && (
+              <div className="info-card">
+                <div className="label">Local card / payment</div>
+                <div className="value"><span className={`status-badge ${tag(payOk).className}`}>{tag(payOk).word}</span></div>
+                <div className="sub">Does a card issued in {country.name} work at checkout?</div>
+              </div>
+            )}
+            {phoneOk && (
+              <div className="info-card">
+                <div className="label">Phone verification</div>
+                <div className="value"><span className={`status-badge ${tag(phoneOk).className}`}>{tag(phoneOk).word}</span></div>
+                <div className="sub">Does a local +{country.iso2} number get accepted?</div>
+              </div>
+            )}
+            {avail?.workaround && (
+              <div className="info-card">
+                <div className="label">Workaround</div>
+                <div className="value" style={{ fontSize: '1rem', fontWeight: 500 }}>{avail.workaround}</div>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      {pricing && pricing.length > 0 && (
+        <>
+          <h2>Price in {country.name}</h2>
+          <table className="price-table">
+            <thead><tr><th>Tier</th><th>Local price</th><th>USD</th><th>Period</th></tr></thead>
+            <tbody>
+              {pricing.map((p) => (
+                <tr key={p.tier}>
+                  <td>{p.tier}</td>
+                  <td>{p.price_local != null ? `${p.price_local} ${p.currency_local || ''}` : '—'}</td>
+                  <td className="price-usd">{p.price_usd != null ? `$${p.price_usd.toFixed(2)}` : '—'}</td>
+                  <td>/{p.period || 'month'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p style={{ fontSize: '0.85rem', color: '#666' }}>Prices shown in local currency where available. USD conversions are approximate.</p>
+        </>
       )}
 
       <AdSlot slot="answer-top" style={{ minHeight: 90 }} />

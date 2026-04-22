@@ -107,3 +107,45 @@ th { background: #f5f5f5; font-weight: 600; }
 }
 
 h2 { margin-top: 2rem; }
+
+/* Finder: homepage country+service filter */
+.finder {
+  margin: 1.5rem auto 0;
+  max-width: 680px;
+  background: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.finder-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.75rem; align-items: end; }
+.finder label { display: flex; flex-direction: column; font-size: 0.85rem; color: #555; gap: 0.35rem; text-align: left; }
+.finder select {
+  padding: 0.7rem 0.85rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 8px; background: white;
+  color: #1a1a1a;
+}
+.finder button {
+  padding: 0.75rem 1.25rem; background: #0066cc; color: white; border: 0; border-radius: 8px;
+  font-size: 1rem; cursor: pointer; font-weight: 600; height: 42px;
+}
+.finder button:disabled { background: #aaa; cursor: not-allowed; }
+@media (max-width: 600px) {
+  .finder-row { grid-template-columns: 1fr; }
+  .finder button { width: 100%; }
+}
+
+/* Details grid on availability page / how-to */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem; margin: 1rem 0;
+}
+.info-card {
+  background: white; border: 1px solid #e5e5e5; border-radius: 10px; padding: 0.9rem 1rem;
+}
+.info-card .label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
+.info-card .value { font-size: 1.1rem; font-weight: 600; margin-top: 0.25rem; }
+.info-card .sub { font-size: 0.85rem; color: #666; margin-top: 0.25rem; }
+
+.price-table td, .price-table th { font-size: 0.95rem; }
+.price-usd { color: #666; font-size: 0.85rem; }

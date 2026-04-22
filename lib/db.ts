@@ -225,6 +225,15 @@ export async function getPricingForService(serviceId: number): Promise<Pricing[]
   return (await cache()).pricing.filter((p) => p.service_id === serviceId);
 }
 
+// Most recent successful scrape timestamp (ISO string). Fresh query — don't cache.
+export async function getLastScrapeAt(): Promise<string | null> {
+  try {
+    const r = await getClient().execute('SELECT run_at FROM scrape_log WHERE ok = 1 ORDER BY run_at DESC LIMIT 1');
+    const row = r.rows[0] as any;
+    return row?.run_at ?? null;
+  } catch { return null; }
+}
+
 // Direct DB writes (bypass cache). Used by /api/report.
 export async function exec(sql: string, params: any[] = []) {
   await getClient().execute({ sql, args: params });

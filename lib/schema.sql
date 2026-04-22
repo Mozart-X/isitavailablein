@@ -88,3 +88,15 @@ CREATE INDEX IF NOT EXISTS idx_reports_reviewed ON user_reports(reviewed);
 CREATE INDEX IF NOT EXISTS idx_scrapelog_date ON scrape_log(run_at);
 CREATE INDEX IF NOT EXISTS idx_pricing_service ON pricing(service_id);
 CREATE INDEX IF NOT EXISTS idx_pricing_country ON pricing(country_iso2);
+
+-- User-submitted suggestions / contact / feedback / service-or-country requests.
+CREATE TABLE IF NOT EXISTS suggestions (
+  id INTEGER PRIMARY KEY,
+  kind TEXT NOT NULL CHECK (kind IN ('service','country','feedback','bug','other')),
+  body TEXT NOT NULL,
+  contact TEXT,           -- optional email or handle
+  ip_hash TEXT,
+  reviewed INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_suggestions_reviewed ON suggestions(reviewed);

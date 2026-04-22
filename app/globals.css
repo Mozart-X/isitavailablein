@@ -176,3 +176,22 @@ h2 { margin-top: 2rem; }
 .currency-switcher label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
 .currency-switcher select { padding: 0.35rem 0.6rem; border: 1px solid #ccc; border-radius: 6px; font-size: 0.95rem; background: white; }
 .currency-switcher .muted { font-size: 0.8rem; color: #888; }
+
+/* Suggest / contact form */
+.suggest-card {
+  background: white; border: 1px solid #e5e5e5; border-radius: 12px;
+  padding: 1.25rem; margin: 2rem 0; display: grid; gap: 0.6rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.suggest-card .suggest-row { display: grid; gap: 0.4rem; }
+.suggest-card label { display: flex; flex-direction: column; font-size: 0.8rem; color: #555; gap: 0.25rem; }
+.suggest-card select, .suggest-card input, .suggest-card textarea {
+  padding: 0.6rem 0.75rem; font-size: 0.95rem; border: 1px solid #ccc; border-radius: 8px;
+  background: white; color: #1a1a1a; font-family: inherit;
+}
+.suggest-card textarea { resize: vertical; min-height: 80px; }
+.suggest-card button {
+  justify-self: start; padding: 0.6rem 1.2rem; background: #0066cc; color: white; border: 0;
+  border-radius: 8px; font-size: 0.95rem; cursor: pointer; font-weight: 600;
+}
+.suggest-thanks { border-color: #0a6b28; background: #f0fdf4; }

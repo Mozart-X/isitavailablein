@@ -48,6 +48,18 @@ const statements = [
   )`,
   `CREATE INDEX IF NOT EXISTS idx_pricing_service ON pricing(service_id)`,
   `CREATE INDEX IF NOT EXISTS idx_pricing_country ON pricing(country_iso2)`,
+
+  // Suggestions / feedback / contact
+  `CREATE TABLE IF NOT EXISTS suggestions (
+    id INTEGER PRIMARY KEY,
+    kind TEXT NOT NULL,
+    body TEXT NOT NULL,
+    contact TEXT,
+    ip_hash TEXT,
+    reviewed INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_suggestions_reviewed ON suggestions(reviewed)`,
 ];
 
 for (const s of statements) await tryRun(s);

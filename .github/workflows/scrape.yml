@@ -1,9 +1,9 @@
-name: Daily scrape
+name: Scrape
 
 on:
   schedule:
-    - cron: '0 3 * * *'  # 3 AM UTC daily
-  workflow_dispatch:  # allow manual trigger
+    - cron: '0 */2 * * *'  # every 2 hours
+  workflow_dispatch:
 
 jobs:
   scrape:
@@ -18,8 +18,4 @@ jobs:
         env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
-      - name: Trigger Cloudflare Pages rebuild
-        env:
-          HOOK: ${{ secrets.CF_DEPLOY_HOOK }}
-        if: env.HOOK != ''
-        run: curl -X POST "$HOOK"
+      # No CF Pages rebuild hook — site reads Turso live via edge runtime + 5min in-memory cache.

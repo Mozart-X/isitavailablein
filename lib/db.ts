@@ -76,7 +76,9 @@ type Cache = {
 };
 
 let _cache: Cache | null = null;
+let _cacheAt = 0;
 let _loading: Promise<Cache> | null = null;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes — keeps site fresh without rebuild
 
 async function load(): Promise<Cache> {
   const c = getClient();
@@ -126,11 +128,13 @@ async function load(): Promise<Cache> {
 }
 
 async function cache(): Promise<Cache> {
-  if (_cache) return _cache;
+  if (_cache && Date.now() - _cacheAt < CACHE_TTL_MS) return _cache;
   if (_loading) return _loading;
-  _loading = load().then((c) => { _cache = c; _loading = null; return c; });
+  _loading = load().then((c) => { _cache = c; _cacheAt = Date.now(); _loading = null; return c; });
   return _loading;
 }
+
+export function invalidateCache() { _cache = null; _cacheAt = 0; }
 
 export async function getService(slug: string): Promise<Service | null> {
   return (await cache()).serviceBySlug.get(slug) ?? null;

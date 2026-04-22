@@ -1,8 +1,10 @@
-name: Deploy to Cloudflare Pages
+# Cloudflare Pages auto-deploys on push via the Git integration.
+# This workflow is a manual fallback using Wrangler + @cloudflare/next-on-pages.
+# Runs only on workflow_dispatch to avoid double deploys.
+
+name: Manual deploy to Cloudflare Pages
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -14,14 +16,17 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
-      - run: npm run build
+      - name: Build with next-on-pages
+        run: npx @cloudflare/next-on-pages@1
         env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           NEXT_PUBLIC_SITE_URL: https://isitavailablein.com
+          NEXT_PUBLIC_ADSENSE_CLIENT: ${{ secrets.NEXT_PUBLIC_ADSENSE_CLIENT }}
+          NEXT_PUBLIC_NORDVPN_AFF: ${{ secrets.NEXT_PUBLIC_NORDVPN_AFF }}
       - name: Deploy via Wrangler
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy .next --project-name=isitavailablein
+          command: pages deploy .vercel/output/static --project-name=isitavailablein

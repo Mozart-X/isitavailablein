@@ -19,5 +19,7 @@ jobs:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
       - name: Trigger Cloudflare Pages rebuild
-        if: ${{ secrets.CF_DEPLOY_HOOK != '' }}
-        run: curl -X POST "${{ secrets.CF_DEPLOY_HOOK }}"
+        env:
+          HOOK: ${{ secrets.CF_DEPLOY_HOOK }}
+        if: env.HOOK != ''
+        run: curl -X POST "$HOOK"

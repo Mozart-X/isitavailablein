@@ -22,4 +22,9 @@ for (const f of files) {
 }
 
 console.log(`\nDone. ${files.length - failed}/${files.length} succeeded.`);
-process.exit(failed > 0 ? 1 : 0);
+// Don't fail the GH Actions workflow on individual scraper errors —
+// transient site changes are expected. The scrape_log table + admin
+// dashboard surface failures. Only fail if EVERY scraper failed
+// (likely a global problem like DB outage).
+if (files.length > 0 && failed === files.length) process.exit(1);
+process.exit(0);

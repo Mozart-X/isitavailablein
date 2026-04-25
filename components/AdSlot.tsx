@@ -4,43 +4,69 @@ import { useEffect } from 'react';
 
 type Props = {
   slot: string;
-  format?: string;
-  layout?: 'display' | 'in-article';
   style?: React.CSSProperties;
 };
 
-export default function AdSlot({ slot, format = 'auto', layout = 'display', style }: Props) {
-  const client = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
+// Map our semantic slot names → Ezoic numeric placeholder IDs.
+// Configure these IDs in the Ezoic dashboard (Monetization → Ad Tester → Placeholders).
+// 100-series is conventional; bump if Ezoic assigns different numbers.
+const EZOIC_PLACEHOLDERS: Record<string, number> = {
+  'answer-top': 101,
+  'answer-bottom': 102,
+  'sidebar': 103,
+  'in-article': 104,
+};
+
+declare global {
+  interface Window {
+    ezstandalone?: {
+      cmd: Array<() => void>;
+      showAds: (...ids: number[]) => void;
+      destroyPlaceholders: (...ids: number[]) => void;
+      define: (id: number) => void;
+      enable: () => void;
+      display: () => void;
+      refresh: () => void;
+    };
+  }
+}
+
+export default function AdSlot({ slot, style }: Props) {
+  const enabled = !!process.env.NEXT_PUBLIC_EZOIC_ENABLED;
+  const placeholderId = EZOIC_PLACEHOLDERS[slot];
 
   useEffect(() => {
-    if (!client) return;
-    try {
-      // @ts-ignore
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch {}
-  }, [client]);
+    if (!enabled || !placeholderId || typeof window === 'undefined') return;
+    window.ezstandalone = window.ezstandalone || ({ cmd: [] } as any);
+    window.ezstandalone!.cmd.push(() => {
+      try {
+        window.ezstandalone!.showAds(placeholderId);
+      } catch {}
+    });
+    return () => {
+      try {
+        window.ezstandalone?.cmd.push(() => {
+          window.ezstandalone!.destroyPlaceholders(placeholderId);
+        });
+      } catch {}
+    };
+  }, [enabled, placeholderId]);
 
-  if (!client) {
-    // Dev/placeholder: shows a dashed box so you know where ads will appear.
+  if (!enabled || !placeholderId) {
     return (
       <div style={{
         border: '2px dashed #ccc', padding: '1rem', textAlign: 'center',
         color: '#888', fontSize: '0.85rem', margin: '1rem 0', ...style
       }}>
-        [Ad slot: {slot}] — set NEXT_PUBLIC_ADSENSE_CLIENT to enable
+        [Ad slot: {slot}] — set NEXT_PUBLIC_EZOIC_ENABLED=1 once Ezoic is approved
       </div>
     );
   }
 
   return (
-    <ins
-      className="adsbygoogle"
-      style={{ display: 'block', ...style }}
-      data-ad-client={client}
-      data-ad-slot={slot}
-      data-ad-format={format}
-      data-ad-layout={layout === 'in-article' ? 'in-article' : undefined}
-      data-full-width-responsive="true"
+    <div
+      id={`ezoic-pub-ad-placeholder-${placeholderId}`}
+      style={{ minHeight: 90, margin: '1rem 0', ...style }}
     />
   );
 }

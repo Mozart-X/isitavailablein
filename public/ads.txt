@@ -1,1 +1,3 @@
-google.com, pub-5150292269242049, DIRECT, f08c47fec0942fa0
+# ads.txt is managed by Ezoic once the site is integrated.
+# Ezoic will inject the appropriate entries via their CDN/Cloudflare app.
+# If using Ezoic Name Server Integration, this file is automatically replaced.

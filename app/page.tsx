@@ -7,10 +7,10 @@ export const revalidate = 3600;
 
 // Hand-picked popular combinations. Keep this short — it's a teaser, not a directory.
 const POPULAR: Array<[string, string]> = [
-  ['chatgpt', 'united-states'],
-  ['chatgpt', 'nepal'],
+  ['chatgpt', 'china'],
+  ['chatgpt', 'turkey'],
   ['netflix', 'india'],
-  ['spotify', 'nepal'],
+  ['spotify', 'pakistan'],
   ['revolut', 'united-kingdom'],
   ['binance', 'germany'],
 ];

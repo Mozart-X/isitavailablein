@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true }
 };
 
-const ADSENSE = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
+const EZOIC_ENABLED = process.env.NEXT_PUBLIC_EZOIC_ENABLED;
 const PLAUSIBLE = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID; // e.g. G-XXXXXXXXXX
 const CF_BEACON = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN; // Cloudflare Web Analytics token
@@ -23,13 +23,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        {ADSENSE && (
-          <Script
-            async
-            strategy="afterInteractive"
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE}`}
-            crossOrigin="anonymous"
-          />
+        {EZOIC_ENABLED && (
+          <>
+            <Script
+              id="ezstandalone-init"
+              strategy="beforeInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `window.ezstandalone=window.ezstandalone||{};window.ezstandalone.cmd=window.ezstandalone.cmd||[];`
+              }}
+            />
+            <Script
+              async
+              strategy="afterInteractive"
+              src="//www.ezojs.com/ezoic/sa.min.js"
+            />
+          </>
         )}
         {PLAUSIBLE && (
           <Script

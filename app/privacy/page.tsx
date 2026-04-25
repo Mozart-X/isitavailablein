@@ -31,12 +31,18 @@ export default function PrivacyPage() {
 
       <h2>Advertising</h2>
       <p>
-        We display ads via Google AdSense. Google and its partners may use
-        cookies to serve ads based on prior visits to this and other websites.
-        You can opt out at{' '}
-        <a href="https://www.google.com/settings/ads" rel="noopener noreferrer">google.com/settings/ads</a>{' '}
-        or via{' '}
-        <a href="https://www.aboutads.info/" rel="noopener noreferrer">aboutads.info</a>.
+        This website uses third-party advertising companies, including{' '}
+        <a href="https://www.ezoic.com/" rel="noopener noreferrer">Ezoic</a>, to
+        serve ads when you visit. These companies may use information (not
+        including your name, address, email address, or telephone number) about
+        your visits to this and other websites in order to provide
+        advertisements about goods and services of interest to you. Please see
+        Ezoic&rsquo;s{' '}
+        <a href="https://www.ezoic.com/privacy-policy/" rel="noopener noreferrer">privacy policy</a>{' '}
+        for more details. You can opt out of personalised advertising via{' '}
+        <a href="https://www.aboutads.info/" rel="noopener noreferrer">aboutads.info</a>{' '}
+        or{' '}
+        <a href="https://www.youronlinechoices.com/" rel="noopener noreferrer">youronlinechoices.com</a>.
       </p>
 
       <h2>Third-party services</h2>

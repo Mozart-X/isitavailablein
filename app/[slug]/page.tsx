@@ -85,13 +85,14 @@ export default async function Page({ params }: { params: { slug: string } }) {
     }]
   };
 
+  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://isitavailablein.com';
   const breadcrumb = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: process.env.NEXT_PUBLIC_SITE_URL || 'https://isitavailablein.com' },
-      { '@type': 'ListItem', position: 2, name: service.name, item: `/service/${service.slug}` },
-      { '@type': 'ListItem', position: 3, name: country.name, item: `/${params.slug}` }
+      { '@type': 'ListItem', position: 1, name: 'Home', item: base },
+      { '@type': 'ListItem', position: 2, name: service.name, item: `${base}/service/${service.slug}` },
+      { '@type': 'ListItem', position: 3, name: country.name, item: `${base}/${params.slug}` }
     ]
   };
 

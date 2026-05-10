@@ -18,11 +18,41 @@ const EZOIC_ENABLED = process.env.NEXT_PUBLIC_EZOIC_ENABLED;
 const PLAUSIBLE = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID; // e.g. G-XXXXXXXXXX
 const CF_BEACON = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN; // Cloudflare Web Analytics token
+// Sovrn Commerce (formerly VigLink): auto-monetizes outbound links to thousands
+// of merchants via one signup. Set to your Sovrn site ID once approved.
+const SOVRN_ID = process.env.NEXT_PUBLIC_SOVRN_ID;
+// Adsterra: display ad network with no traffic minimum. Set the JS direct-link
+// or banner zone ID once approved. We render their script if set.
+const ADSTERRA_KEY = process.env.NEXT_PUBLIC_ADSTERRA_KEY;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
+        {SOVRN_ID && (
+          <>
+            <Script
+              id="sovrn-init"
+              strategy="beforeInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `var vglnk = {key: '${SOVRN_ID}'};`
+              }}
+            />
+            <Script
+              async
+              strategy="afterInteractive"
+              src="https://cdn.viglink.com/api/vglnk.js"
+            />
+          </>
+        )}
+        {ADSTERRA_KEY && (
+          <Script
+            async
+            strategy="afterInteractive"
+            data-cfasync="false"
+            src={`//pl${ADSTERRA_KEY}.profitableratecpm.com/${ADSTERRA_KEY}/invoke.js`}
+          />
+        )}
         {EZOIC_ENABLED && (
           <>
             <Script
@@ -108,6 +138,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <a href="/" className="logo">IsItAvailableIn<span>.com</span></a>
           <nav>
             <a href="/best-vpn">Best VPN</a>
+            <a href="/deals">Deals</a>
             <a href="/services">All services</a>
             <a href="/countries">All countries</a>
             <a href="/changes">Recent changes</a>

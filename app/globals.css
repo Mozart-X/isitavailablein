@@ -134,6 +134,92 @@ main {
   pointer-events: none !important;
 }
 
+/* MoneyStack — 3-tool affiliate stack shown on blocked pages */
+.money-stack {
+  margin: 2rem 0; padding: 1.5rem; background: #fafbfc;
+  border: 1px solid #e5e7eb; border-radius: 14px;
+}
+.money-stack-title {
+  margin: 0 0 0.5rem; font-size: 1.4rem; color: #1a1a1a;
+}
+.money-stack-sub {
+  margin: 0 0 1.25rem; color: #555; font-size: 0.95rem; line-height: 1.5;
+}
+.money-stack-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
+}
+.money-card {
+  background: white; border: 1px solid #e5e7eb; border-top: 4px solid #0066cc;
+  border-radius: 10px; padding: 1.25rem 1rem 1rem; position: relative;
+  display: flex; flex-direction: column;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.money-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+.money-card-step {
+  position: absolute; top: -14px; left: 1rem; width: 28px; height: 28px;
+  border-radius: 50%; color: white; font-weight: 700; font-size: 0.9rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.money-card-title { font-weight: 700; font-size: 1.05rem; margin: 0.25rem 0 0.35rem; }
+.money-card-sub {
+  color: #666; font-size: 0.88rem; line-height: 1.45; margin-bottom: 1rem;
+  flex: 1;
+}
+.money-card-cta {
+  display: inline-block; color: white !important; text-decoration: none;
+  padding: 0.6rem 1rem; border-radius: 8px; font-weight: 600;
+  text-align: center; font-size: 0.95rem;
+}
+.money-card-cta:hover { filter: brightness(1.1); }
+.money-card-meta { color: #888; font-size: 0.78rem; margin-top: 0.5rem; line-height: 1.4; }
+.money-stack-disclaimer {
+  margin: 1.25rem 0 0; font-size: 0.78rem; color: #999; text-align: center;
+}
+@media (max-width: 768px) {
+  .money-stack-grid { grid-template-columns: 1fr; }
+}
+
+/* Stats bar — shareable, big-number social proof */
+.stats-bar {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem; margin: 1.5rem 0; padding: 1.25rem;
+  background: linear-gradient(135deg, #0066cc 0%, #1a4d8a 100%);
+  color: white; border-radius: 12px;
+}
+.stats-bar-item { text-align: center; }
+.stats-bar-num {
+  font-size: 2.2rem; font-weight: 800; line-height: 1;
+  display: block; margin-bottom: 0.3rem;
+}
+.stats-bar-label {
+  font-size: 0.85rem; opacity: 0.9; line-height: 1.3;
+}
+
+/* VPN comparison table */
+.vpn-compare {
+  width: 100%; border-collapse: separate; border-spacing: 0;
+  margin: 1.5rem 0; background: white;
+  border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;
+}
+.vpn-compare th, .vpn-compare td {
+  padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid #f0f0f0;
+}
+.vpn-compare thead { background: #f8f9fa; }
+.vpn-compare th { font-weight: 700; font-size: 0.9rem; color: #333; }
+.vpn-compare tbody tr:last-child td { border-bottom: 0; }
+.vpn-compare .rank-1 { background: #fffbea; }
+.vpn-compare .editors-pick {
+  display: inline-block; background: #ffc107; color: #1a1a1a;
+  font-size: 0.7rem; font-weight: 700; padding: 0.1rem 0.4rem; border-radius: 4px;
+  margin-left: 0.4rem; text-transform: uppercase;
+}
+.vpn-compare-cta {
+  display: inline-block; padding: 0.45rem 0.9rem;
+  background: #0066cc; color: white !important; border-radius: 6px;
+  font-weight: 600; font-size: 0.85rem; text-decoration: none; white-space: nowrap;
+}
+.vpn-compare-cta:hover { background: #0052a3; }
+
 .sources { margin-top: 1.5rem; padding: 1rem; background: #f5f5f5; border-radius: 8px; font-size: 0.9rem; }
 .sources a { color: #0066cc; }
 

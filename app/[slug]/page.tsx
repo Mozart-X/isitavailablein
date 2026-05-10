@@ -4,6 +4,7 @@ import { parseAvailabilitySlug, buildAvailabilitySlug, statusAnswer } from '@/li
 import AdSlot from '@/components/AdSlot';
 import PriceTable from '@/components/PriceTable';
 import VpnCta from '@/components/VpnCta';
+import MoneyStack from '@/components/MoneyStack';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
@@ -211,11 +212,17 @@ export default async function Page({ params }: { params: { slug: string } }) {
         </>
       )}
 
+      {isUnavailable && <MoneyStack serviceName={service.name} countryName={country.name} />}
+
       <h2>Related</h2>
       <div className="grid">
         <a href={`/service/${service.slug}`}>All countries for {service.name}</a>
         <a href={`/service/${service.slug}/price`}>Price by country for {service.name}</a>
         <a href={`/country/${country.slug}`}>All services in {country.name}</a>
+        <a href={`/best-vpn-for/${service.slug}`}>Best VPN for {service.name}</a>
+        <a href={`/best-vpn-for/${country.slug}`}>Best VPN for {country.name}</a>
+        <a href={`/cheapest/${service.slug}`}>Cheapest country for {service.name}</a>
+        <a href={`/apps-banned-in/${country.slug}`}>Apps banned in {country.name}</a>
       </div>
     </article>
   );

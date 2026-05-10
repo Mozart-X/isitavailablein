@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { getAllServices, getService, getAvailabilityForService } from '@/lib/db';
 import { buildAvailabilitySlug, statusAnswer } from '@/lib/url';
 import VpnCta from '@/components/VpnCta';
+import MoneyStack from '@/components/MoneyStack';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
@@ -92,6 +93,15 @@ export default async function Page({ params }: { params: { slug: string } }) {
             <span className="status-badge status-yes">Yes</span>
           </a>
         ))}
+      </div>
+
+      {no.length > 0 && <MoneyStack serviceName={s.name} />}
+
+      <h2>Related</h2>
+      <div className="grid">
+        <a href={`/best-vpn-for/${s.slug}`}>Best VPN for {s.name}</a>
+        <a href={`/cheapest/${s.slug}`}>Cheapest country for {s.name}</a>
+        <a href={`/service/${s.slug}/price`}>Full price breakdown</a>
       </div>
     </article>
   );

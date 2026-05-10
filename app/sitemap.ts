@@ -12,6 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/changes`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
     { url: `${base}/services`, lastModified: now, changeFrequency: 'weekly', priority: 0.6 },
     { url: `${base}/countries`, lastModified: now, changeFrequency: 'weekly', priority: 0.6 },
+    { url: `${base}/best-vpn`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${base}/about`, lastModified: now, changeFrequency: 'monthly', priority: 0.3 },
     { url: `${base}/contact`, lastModified: now, changeFrequency: 'monthly', priority: 0.3 },
     { url: `${base}/privacy`, lastModified: now, changeFrequency: 'yearly', priority: 0.2 },
@@ -20,9 +21,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const s of services) {
     entries.push({ url: `${base}/service/${s.slug}`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 });
+    entries.push({ url: `${base}/cheapest/${s.slug}`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 });
+    entries.push({ url: `${base}/best-vpn-for/${s.slug}`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 });
   }
   for (const c of countries) {
     entries.push({ url: `${base}/country/${c.slug}`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 });
+    entries.push({ url: `${base}/apps-banned-in/${c.slug}`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 });
+    entries.push({ url: `${base}/best-vpn-for/${c.slug}`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 });
   }
   for (const s of services) {
     for (const c of countries) {

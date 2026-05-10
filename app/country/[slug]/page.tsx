@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { getAllCountries, getCountry, getAvailabilityForCountry } from '@/lib/db';
 import { buildAvailabilitySlug } from '@/lib/url';
 import VpnCta from '@/components/VpnCta';
+import MoneyStack from '@/components/MoneyStack';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
@@ -66,6 +67,14 @@ export default async function Page({ params }: { params: { slug: string } }) {
           </div>
         );
       })}
+
+      <MoneyStack countryName={c.name} />
+
+      <h2>Related</h2>
+      <div className="grid">
+        <a href={`/apps-banned-in/${c.slug}`}>Full list of apps banned in {c.name}</a>
+        <a href={`/best-vpn-for/${c.slug}`}>Best VPN for {c.name}</a>
+      </div>
     </article>
   );
 }

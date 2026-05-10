@@ -84,6 +84,49 @@ main {
 }
 .cta-banner a:hover { text-decoration: none; background: #f0f0f0; }
 
+/* VpnCta — bigger, conversion-tuned banner */
+.vpn-banner {
+  background: linear-gradient(135deg, #1a4d8a, #0066cc 60%, #0099ff);
+  color: white; padding: 1.5rem 1.75rem; border-radius: 14px; margin: 1.75rem 0;
+  display: flex; justify-content: space-between; align-items: center; gap: 1.5rem;
+  flex-wrap: wrap; box-shadow: 0 4px 18px rgba(0, 102, 204, 0.2);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.vpn-banner-text { flex: 1 1 280px; }
+.vpn-banner-heading {
+  font-size: 1.25rem; font-weight: 700; line-height: 1.3; margin-bottom: 0.4rem;
+}
+.vpn-banner-sub { font-size: 0.95rem; opacity: 0.95; line-height: 1.45; margin-bottom: 0.5rem; }
+.vpn-banner-stars {
+  font-size: 0.85rem; color: #ffd700; display: flex; align-items: center; gap: 0.5rem;
+}
+.vpn-banner-stars span { color: rgba(255,255,255,0.85); }
+.vpn-banner-cta {
+  background: #ffc107; color: #1a1a1a !important; padding: 0.85rem 1.6rem;
+  border-radius: 10px; font-weight: 700; font-size: 1.05rem; white-space: nowrap;
+  text-decoration: none; box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: all 0.15s;
+}
+.vpn-banner-cta:hover { background: #ffd700; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+
+.vpn-inline {
+  background: #fffbea; border-left: 3px solid #ffc107; padding: 0.75rem 1rem;
+  border-radius: 0 8px 8px 0; margin: 1rem 0; font-size: 0.95rem;
+}
+.vpn-inline a { color: #0066cc; font-weight: 600; }
+.vpn-inline small { color: #888; font-size: 0.75rem; margin-left: 0.5rem; }
+
+.vpn-compact {
+  display: inline-block; background: #ffc107; color: #1a1a1a !important;
+  padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.9rem;
+  text-decoration: none;
+}
+.vpn-compact:hover { background: #ffd700; }
+
+@media (max-width: 600px) {
+  .vpn-banner { padding: 1.25rem; }
+  .vpn-banner-cta { width: 100%; text-align: center; }
+}
+
 .sources { margin-top: 1.5rem; padding: 1rem; background: #f5f5f5; border-radius: 8px; font-size: 0.9rem; }
 .sources a { color: #0066cc; }
 

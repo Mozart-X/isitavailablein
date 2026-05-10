@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getAllServices, getService, getAvailabilityForService } from '@/lib/db';
 import { buildAvailabilitySlug, statusAnswer } from '@/lib/url';
+import VpnCta from '@/components/VpnCta';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
@@ -51,6 +52,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
               </a>
             ))}
           </div>
+          <VpnCta variant="banner" serviceName={s.name} />
         </>
       )}
 

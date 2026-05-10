@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation';
 import { getAllServices, getAllCountries, getService, getCountry, getAvailability, getPricing, getAvailabilityForCountry } from '@/lib/db';
 import { parseAvailabilitySlug, buildAvailabilitySlug, statusAnswer } from '@/lib/url';
-import { vpnLink } from '@/lib/affiliate';
 import AdSlot from '@/components/AdSlot';
 import PriceTable from '@/components/PriceTable';
+import VpnCta from '@/components/VpnCta';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
@@ -73,8 +73,6 @@ export default async function Page({ params }: { params: { slug: string } }) {
     if (v === 'medium') return { word: 'Medium', className: 'status-partial' };
     return { word: v, className: 'status-unknown' };
   };
-  const vpn = vpnLink('nord');
-
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -115,13 +113,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
       </div>
 
       {isUnavailable && (
-        <div className="cta-banner">
-          <div>
-            <strong>Access {service.name} from {country.name} with a VPN</strong>
-            <div>Unblock {service.name} in under a minute.</div>
-          </div>
-          <a href={vpn.href} rel="nofollow sponsored" target="_blank">{vpn.label} →</a>
-        </div>
+        <VpnCta variant="banner" serviceName={service.name} countryName={country.name} />
       )}
 
       {hasAnyDetail && (
@@ -200,6 +192,10 @@ export default async function Page({ params }: { params: { slug: string } }) {
       </div>
 
       <AdSlot slot="answer-bottom" style={{ minHeight: 250 }} />
+
+      {isUnavailable && (
+        <VpnCta variant="banner" serviceName={service.name} countryName={country.name} />
+      )}
 
       {isUnavailable && alternatives.length > 0 && (
         <>

@@ -19,8 +19,9 @@ const PLAUSIBLE = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID; // e.g. G-XXXXXXXXXX
 const CF_BEACON = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN; // Cloudflare Web Analytics token
 // Sovrn Commerce (formerly VigLink): auto-monetizes outbound links to thousands
-// of merchants via one signup. Set to your Sovrn site ID once approved.
-const SOVRN_ID = process.env.NEXT_PUBLIC_SOVRN_ID;
+// of merchants via one signup. The default below is the user's Sovrn ID;
+// override via env var if you ever rotate.
+const SOVRN_ID = process.env.NEXT_PUBLIC_SOVRN_ID || '1ebva00';
 // Adsterra: display ad network with no traffic minimum. Set the JS direct-link
 // or banner zone ID once approved. We render their script if set.
 const ADSTERRA_KEY = process.env.NEXT_PUBLIC_ADSTERRA_KEY;

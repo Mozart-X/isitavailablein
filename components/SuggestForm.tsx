@@ -8,6 +8,9 @@ import { useEffect, useState } from 'react';
 export default function SuggestForm() {
   const [kind, setKind] = useState<'service' | 'country' | 'feedback' | 'bug' | 'other'>('service');
   const [posted, setPosted] = useState(false);
+  // Form-load timestamp for time-to-fill anti-bot. Submissions <3s after load
+  // are silently dropped server-side. Bots that auto-submit get filtered.
+  const [loadedAt] = useState(() => Date.now());
 
   useEffect(() => {
     try {
@@ -59,6 +62,18 @@ export default function SuggestForm() {
       </div>
       <textarea name="body" required minLength={3} maxLength={2000} rows={3} placeholder={placeholder} />
       <input type="email" name="contact" placeholder="Your email (optional — only if you want a reply)" />
+      {/* Honeypot — hidden from real users via CSS, bots fill every field. */}
+      <div className="hp-field" aria-hidden="true">
+        <label>
+          Website (leave blank)
+          <input type="text" name="url" tabIndex={-1} autoComplete="off" />
+        </label>
+        <label>
+          Your website (leave blank)
+          <input type="text" name="website" tabIndex={-1} autoComplete="off" />
+        </label>
+      </div>
+      <input type="hidden" name="_t" value={loadedAt} />
       <button type="submit">Send</button>
     </form>
   );

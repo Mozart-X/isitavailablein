@@ -127,6 +127,13 @@ main {
   .vpn-banner-cta { width: 100%; text-align: center; }
 }
 
+/* Honeypot: hidden from humans, visible to bots that read raw HTML/CSS. */
+.hp-field {
+  position: absolute !important; left: -9999px !important; width: 1px !important;
+  height: 1px !important; overflow: hidden !important; opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 .sources { margin-top: 1.5rem; padding: 1rem; background: #f5f5f5; border-radius: 8px; font-size: 0.9rem; }
 .sources a { color: #0066cc; }
 

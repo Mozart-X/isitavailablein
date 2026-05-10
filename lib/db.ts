@@ -238,3 +238,9 @@ export async function getLastScrapeAt(): Promise<string | null> {
 export async function exec(sql: string, params: any[] = []) {
   await getClient().execute({ sql, args: params });
 }
+
+// Direct DB read (bypass cache). Used by anti-spam rate limiter etc.
+export async function queryRaw(sql: string, params: any[] = []): Promise<any[]> {
+  const r = await getClient().execute({ sql, args: params });
+  return r.rows as any[];
+}

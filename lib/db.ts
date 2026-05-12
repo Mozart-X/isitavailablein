@@ -244,3 +244,29 @@ export async function queryRaw(sql: string, params: any[] = []): Promise<any[]> 
   const r = await getClient().execute({ sql, args: params });
   return r.rows as any[];
 }
+
+// Aggregate scrape activity stats — used to prove the scraper is alive
+// even when no status changes are detected (which is itself good news).
+export async function getScrapeActivity(): Promise<{
+  totalRuns24h: number;
+  totalRuns7d: number;
+  servicesChecked24h: string[];
+  lastRunPerService: Array<{ service_slug: string; last_run: string }>;
+}> {
+  try {
+    const [a, b, c, d] = await Promise.all([
+      getClient().execute(`SELECT COUNT(*) AS n FROM scrape_log WHERE ok=1 AND run_at > datetime('now','-24 hours')`),
+      getClient().execute(`SELECT COUNT(*) AS n FROM scrape_log WHERE ok=1 AND run_at > datetime('now','-7 days')`),
+      getClient().execute(`SELECT DISTINCT service_slug FROM scrape_log WHERE ok=1 AND run_at > datetime('now','-24 hours') ORDER BY service_slug`),
+      getClient().execute(`SELECT service_slug, MAX(run_at) AS last_run FROM scrape_log WHERE ok=1 GROUP BY service_slug ORDER BY last_run DESC LIMIT 20`),
+    ]);
+    return {
+      totalRuns24h: Number((a.rows[0] as any)?.n || 0),
+      totalRuns7d: Number((b.rows[0] as any)?.n || 0),
+      servicesChecked24h: (c.rows as any[]).map((r) => String(r.service_slug)),
+      lastRunPerService: (d.rows as any[]).map((r) => ({ service_slug: String(r.service_slug), last_run: String(r.last_run) })),
+    };
+  } catch {
+    return { totalRuns24h: 0, totalRuns7d: 0, servicesChecked24h: [], lastRunPerService: [] };
+  }
+}

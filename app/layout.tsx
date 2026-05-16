@@ -148,7 +148,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main>{children}</main>
         <footer className="site-footer">
           <p>Data updated daily from official sources. Not legal advice. <a href="/about">About</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></p>
-          <p className="site-credit">designed by Abhii</p>
+          <p className="site-credit">Designed by Abhii 👾</p>
         </footer>
       </body>
     </html>

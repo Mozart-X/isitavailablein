@@ -1,4 +1,4 @@
-import { getAllServices, getAllCountries, getRecentChanges, getLastScrapeAt } from '@/lib/db';
+import { getAllServices, getAllCountries, getRecentChanges, getLastScrapeAt, getScrapeActivity } from '@/lib/db';
 import { buildAvailabilitySlug } from '@/lib/url';
 import Finder from '@/components/Finder';
 import SuggestForm from '@/components/SuggestForm';
@@ -30,12 +30,22 @@ function relTime(iso: string | null): string {
 }
 
 export default async function HomePage() {
-  const [services, countries, changes, lastScrape] = await Promise.all([
+  const [services, countries, changes, lastScrape, activity] = await Promise.all([
     getAllServices(),
     getAllCountries(),
     getRecentChanges(8),
-    getLastScrapeAt()
+    getLastScrapeAt(),
+    getScrapeActivity()
   ]);
+
+  // Filter to changes from the last 14 days. Older changes are stale on the
+  // homepage — they make the site look frozen. If none are recent, we show
+  // a live activity dashboard instead.
+  const recentCutoff = Date.now() - 14 * 24 * 3600 * 1000;
+  const recentChanges = changes.filter((c: any) => {
+    const t = new Date(String(c.changed_at).replace(' ', 'T') + 'Z').getTime();
+    return !isNaN(t) && t > recentCutoff;
+  });
 
   const serviceBySlug = new Map(services.map((s) => [s.slug, s]));
   const countryBySlug = new Map(countries.map((c) => [c.slug, c]));
@@ -71,30 +81,56 @@ export default async function HomePage() {
       </section>
 
       <section>
-        <h2>Recent status changes</h2>
-        {changes.length === 0 ? (
-          <p style={{ color: '#666' }}>
-            No changes detected yet. Last checked <strong>{relTime(lastScrape)}</strong>.
-          </p>
+        <h2>Live data feed</h2>
+        {recentChanges.length > 0 ? (
+          <>
+            <p style={{ color: '#666', fontSize: '0.95rem' }}>
+              Recent status flips detected by our scrapers in the last 14 days:
+            </p>
+            <table>
+              <thead><tr><th>When</th><th>Service</th><th>Country</th><th>Change</th></tr></thead>
+              <tbody>
+                {recentChanges.map((c: any) => (
+                  <tr key={c.id}>
+                    <td>{new Date(c.changed_at).toLocaleDateString()}</td>
+                    <td><a href={`/service/${c.service_slug}`}>{c.service_name}</a></td>
+                    <td><a href={`/country/${c.country_slug}`}>{c.country_name}</a></td>
+                    <td><span className={`status-badge status-${c.old_status}`}>{c.old_status || '—'}</span> → <span className={`status-badge status-${c.new_status}`}>{c.new_status}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
         ) : (
-          <table>
-            <thead><tr><th>When</th><th>Service</th><th>Country</th><th>Change</th></tr></thead>
-            <tbody>
-              {changes.map((c: any) => (
-                <tr key={c.id}>
-                  <td>{new Date(c.changed_at).toLocaleDateString()}</td>
-                  <td><a href={`/service/${c.service_slug}`}>{c.service_name}</a></td>
-                  <td><a href={`/country/${c.country_slug}`}>{c.country_name}</a></td>
-                  <td><span className={`status-badge status-${c.old_status}`}>{c.old_status || '—'}</span> → <span className={`status-badge status-${c.new_status}`}>{c.new_status}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <>
+            <p style={{ color: '#444', fontSize: '0.95rem' }}>
+              No status flips in the last 14 days — that means the services we track
+              are <strong>currently stable</strong> in their countries. Here's what our
+              scrapers have been doing:
+            </p>
+            <div className="stats-bar">
+              <div className="stats-bar-item">
+                <span className="stats-bar-num">{activity.totalRuns24h}</span>
+                <span className="stats-bar-label">checks in last 24h</span>
+              </div>
+              <div className="stats-bar-item">
+                <span className="stats-bar-num">{activity.totalRuns7d}</span>
+                <span className="stats-bar-label">checks in last 7 days</span>
+              </div>
+              <div className="stats-bar-item">
+                <span className="stats-bar-num">{services.length}</span>
+                <span className="stats-bar-label">services tracked</span>
+              </div>
+              <div className="stats-bar-item">
+                <span className="stats-bar-num">{relTime(lastScrape)}</span>
+                <span className="stats-bar-label">last check</span>
+              </div>
+            </div>
+            <p style={{ fontSize: '0.85rem', color: '#888', marginTop: '0.5rem' }}>
+              <a href="/changes">See full change history →</a>
+            </p>
+          </>
         )}
-        <p style={{ fontSize: '0.85rem', color: '#888' }}>
-          Last checked: <strong>{relTime(lastScrape)}</strong>
-          {' · '}<a href="/changes">See all changes →</a>
-        </p>
       </section>
 
       <section>

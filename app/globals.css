@@ -127,6 +127,11 @@ main {
   .vpn-banner-cta { width: 100%; text-align: center; }
 }
 
+.site-credit {
+  margin: 0.5rem 0 0 !important; font-size: 0.78rem; color: #aaa;
+  letter-spacing: 0.04em; font-style: italic;
+}
+
 /* Honeypot: hidden from humans, visible to bots that read raw HTML/CSS. */
 .hp-field {
   position: absolute !important; left: -9999px !important; width: 1px !important;

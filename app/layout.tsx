@@ -21,7 +21,7 @@ const CF_BEACON = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN; // Cloudflare Web Ana
 // Sovrn Commerce (formerly VigLink): auto-monetizes outbound links to thousands
 // of merchants via one signup. The default below is the user's Sovrn ID;
 // override via env var if you ever rotate.
-const SOVRN_ID = process.env.NEXT_PUBLIC_SOVRN_ID || '1ebva00';
+const SOVRN_ID = process.env.NEXT_PUBLIC_SOVRN_ID || '4139c3824c3211b7c02d4b3a981dd485';
 // Adsterra: display ad network with no traffic minimum. Set the JS direct-link
 // or banner zone ID once approved. We render their script if set.
 const ADSTERRA_KEY = process.env.NEXT_PUBLIC_ADSTERRA_KEY;

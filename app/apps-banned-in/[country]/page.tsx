@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { params: { country: string }
   return {
     title: `Apps banned in ${c.name} (${new Date().getFullYear()} updated list)`,
     description: `Complete list of apps and services blocked in ${c.name}. Includes social media, streaming, AI, banking. How to access them with a VPN.`,
-    alternates: { canonical: `/apps-banned-in-${params.country}` }
+    alternates: { canonical: `/apps-banned-in/${params.country}` }
   };
 }
 

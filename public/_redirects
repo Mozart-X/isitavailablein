@@ -1,0 +1,10 @@
+# Cloudflare Pages _redirects — 301s for legacy URLs Google still has indexed.
+# Format: SOURCE  DESTINATION  STATUS
+
+# Old icon paths that were moved to /favicon.svg
+/icon.svg          /favicon.svg            301
+/apple-icon.svg    /apple-touch-icon.svg   301
+
+# Old dash-form canonical mistakenly published in our metadata.
+# Wildcard catches /apps-banned-in-china → /apps-banned-in/china etc.
+/apps-banned-in-:country   /apps-banned-in/:country   301

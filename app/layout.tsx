@@ -127,7 +127,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   '@id': 'https://isitavailablein.com/#org',
                   name: 'IsItAvailableIn',
                   url: 'https://isitavailablein.com/',
-                  logo: 'https://isitavailablein.com/icon.svg'
+                  logo: 'https://isitavailablein.com/favicon.svg'
                 }
               ]
             })

@@ -134,10 +134,15 @@ export async function generateMetadata({ params }: { params: { vpn: string } }):
   const r = REVIEWS[params.vpn as VpnId];
   if (!r) return { title: 'Not found' };
   const year = new Date().getFullYear();
+  const title = `${r.name} review (${year}) — honest deep-dive`;
+  const description = `${r.name} review based on real testing: streaming, speed, server count, refund, jurisdiction. Pros, cons, and who it's actually best for.`;
+  const ogUrl = `/og?t=${encodeURIComponent(`${r.name} review ${year}`)}&s=${encodeURIComponent(`${r.rating}/5 — ${r.tagline}`.slice(0, 80))}&v=vpn`;
   return {
-    title: `${r.name} review (${year}) — honest deep-dive`,
-    description: `${r.name} review based on real testing: streaming, speed, server count, refund, jurisdiction. Pros, cons, and who it's actually best for.`,
-    alternates: { canonical: `/review/${params.vpn}` }
+    title,
+    description,
+    alternates: { canonical: `/review/${params.vpn}` },
+    openGraph: { title, description, images: [ogUrl] },
+    twitter: { card: 'summary_large_image', title, description, images: [ogUrl] },
   };
 }
 

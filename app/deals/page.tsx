@@ -10,10 +10,13 @@ export const revalidate = 86400;
 
 const year = new Date().getFullYear();
 
+const ogUrl = `/og?t=${encodeURIComponent(`VPN Deals & Coupons ${year}`)}&s=${encodeURIComponent('Live discounts on NordVPN, Surfshark, ExpressVPN')}&v=deal`;
 export const metadata: Metadata = {
   title: `Best VPN deals & coupons — ${year}`,
   description: `Live VPN discount codes for NordVPN, Surfshark, ExpressVPN. Plus deals on virtual cards (Wise, Revolut) and travel eSIMs (Airalo). Updated ${year}.`,
-  alternates: { canonical: '/deals' }
+  alternates: { canonical: '/deals' },
+  openGraph: { images: [ogUrl] },
+  twitter: { card: 'summary_large_image', images: [ogUrl] },
 };
 
 const VPN_DEALS = [

@@ -7,10 +7,13 @@ import type { Metadata } from 'next';
 
 export const revalidate = 86400; // 24h
 
+const ogUrl = `/og?t=${encodeURIComponent('Best VPN 2026')}&s=${encodeURIComponent('Top 3 ranked: NordVPN, Surfshark, ExpressVPN')}&v=vpn`;
 export const metadata: Metadata = {
   title: `Best VPN 2026 — Top 3 ranked & compared`,
   description: 'Best VPNs for streaming, unblocking, banking and privacy. Compared by price, server count, refund policy. Updated 2026.',
-  alternates: { canonical: '/best-vpn' }
+  alternates: { canonical: '/best-vpn' },
+  openGraph: { images: [ogUrl] },
+  twitter: { card: 'summary_large_image', images: [ogUrl] },
 };
 
 export default function BestVpnPage() {

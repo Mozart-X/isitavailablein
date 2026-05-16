@@ -45,11 +45,16 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const ans = statusAnswer(status);
   const title = `Is ${service.name} available in ${country.name}? (${ans.word})`;
   const description = `${ans.sentence} Last verified ${avail?.last_verified || 'recently'}. See sources, alternatives, and how to access ${service.name} in ${country.name}.`;
+  const ogVariant = status === 'no' || status === 'vpn_only' ? 'blocked' : status === 'yes' ? 'available' : 'default';
+  const ogTitle = `${service.name} in ${country.flag} ${country.name}: ${ans.word}`;
+  const ogSub = status === 'no' ? 'Blocked — see workarounds' : status === 'vpn_only' ? 'VPN required — see best VPNs' : status === 'partial' ? 'Partially available — see details' : 'Available — see pricing';
+  const ogUrl = `/og?t=${encodeURIComponent(ogTitle)}&s=${encodeURIComponent(ogSub)}&v=${ogVariant}`;
   return {
     title,
     description,
     alternates: { canonical: `/${params.slug}` },
-    openGraph: { title, description }
+    openGraph: { title, description, images: [ogUrl] },
+    twitter: { card: 'summary_large_image', title, description, images: [ogUrl] },
   };
 }
 

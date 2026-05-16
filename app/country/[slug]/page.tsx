@@ -15,10 +15,15 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const c = await getCountry(params.slug);
   if (!c) return { title: 'Not found' };
+  const title = `What services are available in ${c.name}?`;
+  const description = `Complete list of online services (ChatGPT, Netflix, banking, crypto, streaming) available in ${c.name}. Updated daily.`;
+  const ogUrl = `/og?t=${encodeURIComponent(`What works in ${c.flag} ${c.name}?`)}&s=${encodeURIComponent('Availability, pricing, workarounds')}&v=default`;
   return {
-    title: `What services are available in ${c.name}?`,
-    description: `Complete list of online services (ChatGPT, Netflix, banking, crypto, streaming) available in ${c.name}. Updated daily.`,
-    alternates: { canonical: `/country/${params.slug}` }
+    title,
+    description,
+    alternates: { canonical: `/country/${params.slug}` },
+    openGraph: { title, description, images: [ogUrl] },
+    twitter: { card: 'summary_large_image', title, description, images: [ogUrl] },
   };
 }
 

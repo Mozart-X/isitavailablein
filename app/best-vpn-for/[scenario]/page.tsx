@@ -29,10 +29,15 @@ async function resolve(scenario: string) {
 export async function generateMetadata({ params }: { params: { scenario: string } }): Promise<Metadata> {
   const r = await resolve(params.scenario);
   if (!r) return { title: 'Not found' };
+  const title = `Best VPN for ${r.name} (${new Date().getFullYear()})`;
+  const description = `Which VPN actually works for ${r.name}? We compare NordVPN, Surfshark and ExpressVPN on price, servers, and reliability.`;
+  const ogUrl = `/og?t=${encodeURIComponent(`Best VPN for ${r.name}`)}&s=${encodeURIComponent('NordVPN vs Surfshark vs ExpressVPN — ranked')}&v=vpn`;
   return {
-    title: `Best VPN for ${r.name} (${new Date().getFullYear()})`,
-    description: `Which VPN actually works for ${r.name}? We compare NordVPN, Surfshark and ExpressVPN on price, servers, and reliability.`,
-    alternates: { canonical: `/best-vpn-for/${params.scenario}` }
+    title,
+    description,
+    alternates: { canonical: `/best-vpn-for/${params.scenario}` },
+    openGraph: { title, description, images: [ogUrl] },
+    twitter: { card: 'summary_large_image', title, description, images: [ogUrl] },
   };
 }
 

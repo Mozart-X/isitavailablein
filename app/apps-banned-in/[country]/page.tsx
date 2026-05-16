@@ -21,10 +21,15 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: { country: string } }): Promise<Metadata> {
   const c = await getCountry(params.country);
   if (!c) return { title: 'Not found' };
+  const title = `Apps banned in ${c.name} (${new Date().getFullYear()} updated list)`;
+  const description = `Complete list of apps and services blocked in ${c.name}. Includes social media, streaming, AI, banking. How to access them with a VPN.`;
+  const ogUrl = `/og?t=${encodeURIComponent(`Apps banned in ${c.flag} ${c.name}`)}&s=${encodeURIComponent('Complete list + how to access')}&v=blocked`;
   return {
-    title: `Apps banned in ${c.name} (${new Date().getFullYear()} updated list)`,
-    description: `Complete list of apps and services blocked in ${c.name}. Includes social media, streaming, AI, banking. How to access them with a VPN.`,
-    alternates: { canonical: `/apps-banned-in/${params.country}` }
+    title,
+    description,
+    alternates: { canonical: `/apps-banned-in/${params.country}` },
+    openGraph: { title, description, images: [ogUrl] },
+    twitter: { card: 'summary_large_image', title, description, images: [ogUrl] },
   };
 }
 

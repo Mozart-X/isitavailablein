@@ -13,6 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/services`, lastModified: now, changeFrequency: 'weekly', priority: 0.6 },
     { url: `${base}/countries`, lastModified: now, changeFrequency: 'weekly', priority: 0.6 },
     { url: `${base}/best-vpn`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${base}/hire`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${base}/deals`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${base}/review/nordvpn`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${base}/review/surfshark`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },

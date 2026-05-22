@@ -1,5 +1,13 @@
+// Legacy report endpoint. The user-facing form was replaced by
+// <CommunityConfirm /> which posts to /api/confirm. This endpoint is kept
+// only because cached/old pages may still hit it. Hardened with:
+// - Rate-limit: 1 submission per (ip_hash, service_id, country_iso2) per 60s
+//   (fixes the 3-second double-click duplicate that came in 5/21)
+// - Daily cap: 5 reports / 24h / IP
+// New code should use /api/confirm; this endpoint is deprecation-track.
+
 import { NextRequest, NextResponse } from 'next/server';
-import { exec } from '@/lib/db';
+import { exec, queryRaw } from '@/lib/db';
 
 export const runtime = 'edge';
 
@@ -22,12 +30,33 @@ export async function POST(req: NextRequest) {
 
   const ip = req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown';
   const ip_hash = await hashIp(ip);
+  const referer = req.headers.get('referer') || '/';
+  const successRedirect = referer + (referer.includes('?') ? '&' : '?') + 'reported=1';
+
+  // Rate-limit 1: same (ip_hash, service_id, country_iso2) within 60s.
+  // Stops the accidental double-click pattern we just saw in admin.
+  try {
+    const recentPair = await queryRaw(
+      `SELECT 1 FROM user_reports
+        WHERE ip_hash = ? AND service_id = ? AND country_iso2 = ?
+          AND created_at > datetime('now','-60 seconds') LIMIT 1`,
+      [ip_hash, service_id, country_iso2]
+    );
+    if (recentPair.length) return NextResponse.redirect(successRedirect, 303);
+
+    // Rate-limit 2: 5 reports / 24h / IP.
+    const dailyCount = await queryRaw(
+      `SELECT COUNT(*) AS n FROM user_reports
+        WHERE ip_hash = ? AND created_at > datetime('now','-24 hours')`,
+      [ip_hash]
+    );
+    if (Number((dailyCount[0] as any)?.n || 0) >= 5) return NextResponse.redirect(successRedirect, 303);
+  } catch {}
 
   await exec(
     `INSERT INTO user_reports (service_id, country_iso2, reported_status, ip_hash) VALUES (?, ?, ?, ?)`,
     [service_id, country_iso2, status, ip_hash]
   );
 
-  const referer = req.headers.get('referer') || '/';
-  return NextResponse.redirect(referer + '?reported=1', 303);
+  return NextResponse.redirect(successRedirect, 303);
 }

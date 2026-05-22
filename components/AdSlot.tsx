@@ -52,16 +52,9 @@ export default function AdSlot({ slot, style }: Props) {
     };
   }, [enabled, placeholderId]);
 
-  if (!enabled || !placeholderId) {
-    return (
-      <div style={{
-        border: '2px dashed #ccc', padding: '1rem', textAlign: 'center',
-        color: '#888', fontSize: '0.85rem', margin: '1rem 0', ...style
-      }}>
-        [Ad slot: {slot}] — set NEXT_PUBLIC_EZOIC_ENABLED=1 once Ezoic is approved
-      </div>
-    );
-  }
+  // No ad network configured → render nothing. Dev placeholder removed:
+  // it was leaking '[Ad slot: …]' dashed boxes into production.
+  if (!enabled || !placeholderId) return null;
 
   return (
     <div

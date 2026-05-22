@@ -144,7 +144,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
               <div className="info-card">
                 <div className="label">Phone verification</div>
                 <div className="value"><span className={`status-badge ${tag(phoneOk).className}`}>{tag(phoneOk).word}</span></div>
-                <div className="sub">Does a local +{country.iso2} number get accepted?</div>
+                <div className="sub">Does a local {country.name} number get accepted?</div>
               </div>
             )}
             {avail?.workaround && (

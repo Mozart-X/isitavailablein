@@ -15,7 +15,37 @@ Schema per entry:
 
 ---
 
-## 2026-05-21 (latest)
+## 2026-05-23 (latest)
+
+| | Now | Δ vs prev period |
+|---|---|---|
+| 7d users | **66** | −11% (74 → 66) |
+| 7d new users | 71 | −10% |
+| 7d pageviews | 105 | −3% |
+| 1-day users | 4 | −64% |
+| 30-day cumulative users | **134** | +5.5% |
+| Clicks tracked | 2 | flat |
+| Engagement events | 51 | −4% |
+
+**Top geo (7d):** US 27 · China 5 · **Germany 5** ↑ · **France 5** ↑ · Nigeria 3 · Canada 2 · **Egypt 2** (new in top)
+**Sources:** Direct 43 · Organic 22 · Unassigned 8 · **Referral 2** ↑ (1→2)
+**Top page (views):** Homepage 29 · Reddit Norway 8 · Claude Ukraine 7 · /changes 4 · YouTube Peru 3 · Facebook Chile 2 (was 8 — dropped)
+**Realtime now:** 3 active users across India · Nepal · Syria
+
+**Sovrn:** Still "Under review" — no change. 0 commission earned.
+**Admin:** 70 / 61 / 4,270 / 0 failed scrapes / **2 pending reports** / 2 pending suggestions
+
+**Notes:**
+- **First week of decline.** Weekly users 74 → 66 (-11%). Single-week dips are normal noise but worth watching.
+- Yesterday's 1-day count of 4 is unusually low (last week's daily avg was ~11).
+- Mixed signal: Germany/France grew, **Egypt entered top geo**, Referrals doubled (1→2). Bad: US fell 18%, Facebook Chile dropped from #2 → #6.
+- **Real-time shows 3 active users from 3 countries** — site is being used right now.
+- 30-day rolling still climbing (+5.5%) so monthly is fine. Watch next week — if 7d drops again, that's a trend; one week is just noise.
+- No deploys since last check (`c18a7cb` analytics log file).
+
+---
+
+## 2026-05-21
 
 | | Now | Δ vs prev period |
 |---|---|---|

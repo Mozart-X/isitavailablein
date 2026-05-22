@@ -2,7 +2,7 @@
 // where Coinbase holds a license to operate).
 // Source: https://www.coinbase.com/legal/licenses
 
-import { applyUpdate, fetchText } from '../lib/update.mjs';
+import { applyUpdate, fetchText, logUnchanged } from '../lib/update.mjs';
 import { NAME_TO_ISO2, toIso2 } from '../lib/country-map.mjs';
 
 const URL = 'https://www.coinbase.com/legal/licenses';
@@ -12,6 +12,7 @@ const FALLBACK_BLOCKED = ['CN', 'CU', 'IR', 'KP', 'RU', 'SY', 'NP', 'PK', 'BD', 
 async function run() {
   let html = '';
   try { html = await fetchText(URL); } catch (e) { console.warn('[coinbase] fetch failed:', e?.message); }
+  if (html === null) { console.log('[coinbase] source unchanged'); return logUnchanged('coinbase', SOURCE); }
 
   const text = (html || '')
     .replace(/<script[\s\S]*?<\/script>/gi, '')

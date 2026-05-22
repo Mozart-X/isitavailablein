@@ -1,7 +1,7 @@
 // Google Gemini: parse the official availability help article.
 // Source: https://support.google.com/gemini/answer/13575153
 
-import { applyUpdate, fetchText } from '../lib/update.mjs';
+import { applyUpdate, fetchText, logUnchanged } from '../lib/update.mjs';
 import { NAME_TO_ISO2, toIso2 } from '../lib/country-map.mjs';
 
 const URL = 'https://support.google.com/gemini/answer/13575153';
@@ -11,6 +11,7 @@ const FALLBACK_BLOCKED = ['CN', 'CU', 'IR', 'KP', 'RU', 'SY'];
 async function run() {
   let html = '';
   try { html = await fetchText(URL); } catch (e) { console.warn('[gemini] fetch failed:', e?.message); }
+  if (html === null) { console.log('[gemini] source unchanged'); return logUnchanged('gemini', SOURCE); }
 
   const text = (html || '')
     .replace(/<script[\s\S]*?<\/script>/gi, '')

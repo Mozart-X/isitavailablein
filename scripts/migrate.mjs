@@ -86,6 +86,15 @@ const statements = [
   `CREATE INDEX IF NOT EXISTS idx_conf_pair ON confirmations(service_id, country_iso2)`,
   `CREATE INDEX IF NOT EXISTS idx_conf_recent ON confirmations(created_at DESC)`,
   `CREATE INDEX IF NOT EXISTS idx_conf_iphash ON confirmations(ip_hash)`,
+
+  // ETag / Last-Modified cache for conditional GETs. Lets scrapers
+  // skip re-processing when the source page hasn't changed.
+  `CREATE TABLE IF NOT EXISTS etag_cache (
+    url TEXT PRIMARY KEY,
+    etag TEXT,
+    last_modified TEXT,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`,
 ];
 
 for (const s of statements) await tryRun(s);

@@ -34,6 +34,12 @@ async function logRun(serviceSlug, source, ok, stats, error) {
   } catch (e) { console.error('logRun failed:', e.message); }
 }
 
+// Exported helper: log a "source unchanged" run when fetchText returns null
+// (HTTP 304 Not Modified). Lets scrapers early-return without DB churn.
+export async function logUnchanged(serviceSlug, source) {
+  await logRun(serviceSlug, source + ':not-modified', true, { changed: 0, unchanged: 0, skipped: 0 });
+}
+
 export async function applyUpdate(serviceSlug, source, statusByIso) {
   try {
     const svcRows = await query('SELECT id FROM services WHERE slug = ?', [serviceSlug]);
@@ -125,11 +131,52 @@ export async function applyPricing(serviceSlug, source, rows) {
   }
 }
 
+// fetchText with conditional GET support (ETag + Last-Modified).
+// We remember the last ETag/Last-Modified per URL in the etag_cache table.
+// If the source hasn't changed, the server responds 304 and we return null —
+// signaling the caller to skip processing entirely. This saves both bandwidth
+// AND Turso writes when pages haven't actually changed.
+//
+// Returns: { text, status } — text is null if 304 Not Modified
 export async function fetchText(url) {
-  const r = await fetch(url, {
-    headers: { 'User-Agent': 'IsItAvailableIn-Bot/1.0 (+https://isitavailablein.com)' }
-  });
+  let etag = null, lastModified = null;
+  try {
+    const cached = await query('SELECT etag, last_modified FROM etag_cache WHERE url = ?', [url]);
+    if (cached.length) {
+      etag = cached[0].etag;
+      lastModified = cached[0].last_modified;
+    }
+  } catch {}
+
+  const headers = {
+    'User-Agent': 'IsItAvailableIn-Bot/1.0 (+https://isitavailablein.com)',
+    'Accept': 'text/html,application/xhtml+xml',
+  };
+  if (etag) headers['If-None-Match'] = etag;
+  if (lastModified) headers['If-Modified-Since'] = lastModified;
+
+  const r = await fetch(url, { headers });
+
+  // 304 Not Modified — source hasn't changed since last fetch.
+  // Return the body as null; caller should skip scrape.
+  if (r.status === 304) return null;
+
   if (!r.ok) throw new Error(`Fetch ${url} failed: ${r.status}`);
+
+  // Remember new ETag/Last-Modified for next time.
+  const newEtag = r.headers.get('etag');
+  const newLastMod = r.headers.get('last-modified');
+  if (newEtag || newLastMod) {
+    try {
+      await run(
+        `INSERT INTO etag_cache (url, etag, last_modified, updated_at)
+         VALUES (?, ?, ?, datetime('now'))
+         ON CONFLICT(url) DO UPDATE SET
+           etag=excluded.etag, last_modified=excluded.last_modified, updated_at=excluded.updated_at`,
+        [url, newEtag, newLastMod]
+      );
+    } catch {}
+  }
   return await r.text();
 }
 

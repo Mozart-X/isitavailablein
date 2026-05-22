@@ -1,7 +1,7 @@
 // Spotify: parse the official "full list of territories" support article.
 // Source: https://support.spotify.com/us/article/full-list-of-territories-where-spotify-is-available/
 
-import { applyUpdate, fetchText } from '../lib/update.mjs';
+import { applyUpdate, fetchText, logUnchanged } from '../lib/update.mjs';
 import { NAME_TO_ISO2, toIso2 } from '../lib/country-map.mjs';
 
 const URL = 'https://support.spotify.com/us/article/full-list-of-territories-where-spotify-is-available/';
@@ -11,6 +11,7 @@ const FALLBACK_BLOCKED = ['CN', 'KP', 'SY', 'IR', 'CU'];
 async function run() {
   let html = '';
   try { html = await fetchText(URL); } catch (e) { console.warn('[spotify] fetch failed:', e?.message); }
+  if (html === null) { console.log('[spotify] source unchanged'); return logUnchanged('spotify', SOURCE); }
 
   const text = (html || '')
     .replace(/<script[\s\S]*?<\/script>/gi, '')

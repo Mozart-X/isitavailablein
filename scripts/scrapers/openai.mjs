@@ -1,7 +1,7 @@
 // Scraper: OpenAI / ChatGPT supported countries.
 // Source: https://platform.openai.com/docs/supported-countries
 
-import { applyUpdate, fetchText } from '../lib/update.mjs';
+import { applyUpdate, fetchText, logUnchanged } from '../lib/update.mjs';
 import { toIso2 } from '../lib/country-map.mjs';
 
 const URL = 'https://platform.openai.com/docs/supported-countries';
@@ -9,6 +9,7 @@ const SOURCE = 'openai-official';
 
 async function run() {
   const html = await fetchText(URL);
+  if (html === null) { console.log('[openai] source unchanged'); return logUnchanged('chatgpt', SOURCE); }
 
   // The page renders a long list of country names. Extract text inside <li> or after known markers.
   // Strategy: extract all text, then match against our known country-name dictionary.

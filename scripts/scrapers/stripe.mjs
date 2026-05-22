@@ -1,7 +1,7 @@
 // Stripe: parse the official supported-countries page.
 // Source: https://stripe.com/global
 
-import { applyUpdate, fetchText } from '../lib/update.mjs';
+import { applyUpdate, fetchText, logUnchanged } from '../lib/update.mjs';
 import { NAME_TO_ISO2, toIso2 } from '../lib/country-map.mjs';
 
 const URL = 'https://stripe.com/global';
@@ -11,6 +11,7 @@ const FALLBACK_AVAILABLE = ['US','GB','CA','AU','NZ','IE','DE','FR','IT','ES','N
 async function run() {
   let html = '';
   try { html = await fetchText(URL); } catch (e) { console.warn('[stripe] fetch failed:', e?.message); }
+  if (html === null) { console.log('[stripe] source unchanged'); return logUnchanged('stripe', SOURCE); }
 
   const text = (html || '')
     .replace(/<script[\s\S]*?<\/script>/gi, '')

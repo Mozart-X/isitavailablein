@@ -1,7 +1,7 @@
 // Scraper: Anthropic / Claude supported countries.
 // Source: https://www.anthropic.com/supported-countries
 
-import { applyUpdate, fetchText } from '../lib/update.mjs';
+import { applyUpdate, fetchText, logUnchanged } from '../lib/update.mjs';
 import { NAME_TO_ISO2, toIso2 } from '../lib/country-map.mjs';
 
 const URL = 'https://www.anthropic.com/supported-countries';
@@ -9,6 +9,7 @@ const SOURCE = 'anthropic-official';
 
 async function run() {
   const html = await fetchText(URL);
+  if (html === null) { console.log('[anthropic] source unchanged'); return logUnchanged('claude', SOURCE); }
 
   const text = html.replace(/<script[\s\S]*?<\/script>/gi, '')
                    .replace(/<style[\s\S]*?<\/style>/gi, '')

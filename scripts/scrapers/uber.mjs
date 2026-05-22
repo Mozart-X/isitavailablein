@@ -8,7 +8,7 @@
 // like "no ride-hail but does have Eats" — which we currently treat
 // as available for simplicity).
 
-import { applyUpdate, fetchText } from '../lib/update.mjs';
+import { applyUpdate, fetchText, logUnchanged } from '../lib/update.mjs';
 import { NAME_TO_ISO2, toIso2 } from '../lib/country-map.mjs';
 
 const URL = 'https://www.uber.com/global/en/cities/';
@@ -24,6 +24,7 @@ const FALLBACK_BLOCKED = ['CN', 'CU', 'IR', 'KP', 'SY', 'DK', 'HU', 'BG', 'LK', 
 async function run() {
   let html = '';
   try { html = await fetchText(URL); } catch (e) { console.warn('[uber] fetch failed:', e?.message); }
+  if (html === null) { console.log('[uber] source unchanged'); return logUnchanged('uber', SOURCE); }
 
   // Strip script/style and HTML tags, lowercase for matching.
   const text = (html || '')

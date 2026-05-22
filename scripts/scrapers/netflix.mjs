@@ -2,7 +2,7 @@
 // only a few are blocked (China, North Korea, Syria, Russia suspended).
 // Source: https://help.netflix.com/en/node/14164
 
-import { applyUpdate, fetchText } from '../lib/update.mjs';
+import { applyUpdate, fetchText, logUnchanged } from '../lib/update.mjs';
 
 const URL = 'https://help.netflix.com/en/node/14164';
 const SOURCE = 'netflix-official';
@@ -11,6 +11,7 @@ async function run() {
   let html = '';
   try {
     html = await fetchText(URL);
+    if (html === null) { console.log('[netflix] source unchanged'); return logUnchanged('netflix', SOURCE); }
   } catch (e) {
     console.warn('[netflix] fetch failed, falling back to static known list:', e.message);
   }

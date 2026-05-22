@@ -346,83 +346,45 @@ th { background: #f5f5f5; font-weight: 600; }
 
 h2 { margin-top: 2rem; }
 
-/* Finder: two separate "browse by X" cards on homepage hero */
+/* Finder: single inline question. Minimal. */
 .finder {
-  margin: 1.5rem auto 0; max-width: 920px; text-align: left;
+  margin: 1.5rem auto 0; max-width: 820px; text-align: center;
 }
-.finder-cards {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+.finder-inline {
+  display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+  justify-content: center;
+  background: white; border: 1px solid #e5e7eb; border-radius: 14px;
+  padding: 0.9rem 1.1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
-.finder-card {
-  background: white; border: 1px solid #e5e7eb; border-radius: 12px;
-  padding: 1.1rem 1.2rem 1.2rem;
-  display: flex; flex-direction: column; gap: 0.55rem;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-.finder-card:hover, .finder-card:focus-within {
-  border-color: #0066cc; box-shadow: 0 4px 14px rgba(0,102,204,0.08);
-}
-.finder-card-label {
-  font-weight: 700; font-size: 1.05rem; color: #1a1a1a;
-}
-.finder-card-sub {
-  font-size: 0.85rem; color: #666; line-height: 1.4;
-}
-.finder-card-row {
-  display: grid; grid-template-columns: 1fr auto; gap: 0.5rem; margin-top: 0.3rem;
-}
-.finder-card-row select {
-  padding: 0.7rem 0.85rem; font-size: 1rem;
-  border: 1px solid #ccc; border-radius: 10px; background: white; color: #1a1a1a;
-}
-.finder-card-row select:focus {
-  outline: none; border-color: #0066cc; box-shadow: 0 0 0 3px rgba(0,102,204,0.15);
-}
-.finder-card-row button {
-  padding: 0.7rem 1.2rem; background: #0066cc; color: white; border: 0;
-  border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer;
-}
-.finder-card-row button:hover:not(:disabled) { background: #0055aa; }
-.finder-card-row button:disabled { background: #bbb; cursor: not-allowed; }
-
-.finder-quick-links {
-  margin-top: 0.9rem; text-align: center;
-  font-size: 0.92rem;
-}
-.finder-quick-links a {
-  color: #0066cc; font-weight: 600; text-decoration: none;
-  padding: 0.2rem 0.4rem;
-}
-.finder-quick-links a:hover { text-decoration: underline; }
-.finder-quick-sep { color: #ccc; margin: 0 0.3rem; }
-
-.finder-combo { margin-top: 0.6rem; text-align: center; }
-.finder-combo-toggle {
-  background: none; border: 0; color: #0066cc; font-size: 0.9rem;
-  cursor: pointer; padding: 0.4rem 0.6rem;
-}
-.finder-combo-toggle:hover { text-decoration: underline; }
-.finder-combo-row {
-  display: grid; grid-template-columns: 1fr auto 1fr auto; gap: 0.5rem;
-  align-items: center; margin-top: 0.6rem; max-width: 680px; margin-left: auto; margin-right: auto;
-}
-.finder-combo-row select {
-  padding: 0.55rem 0.7rem; font-size: 0.92rem;
+.finder-prefix { color: #555; font-size: 1rem; font-weight: 500; }
+.finder-inline select {
+  flex: 1 1 180px; min-width: 0;
+  padding: 0.6rem 0.7rem; font-size: 1rem;
   border: 1px solid #ccc; border-radius: 8px; background: white; color: #1a1a1a;
 }
-.finder-combo-in { color: #888; font-size: 0.9rem; }
-.finder-combo-row button {
-  padding: 0.55rem 1rem; background: #0066cc; color: white; border: 0;
-  border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+.finder-inline select:focus {
+  outline: none; border-color: #0066cc; box-shadow: 0 0 0 3px rgba(0,102,204,0.15);
 }
-.finder-combo-row button:disabled { background: #bbb; cursor: not-allowed; }
+.finder-inline button {
+  padding: 0.6rem 1.3rem; background: #0066cc; color: white; border: 0;
+  border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer;
+}
+.finder-inline button:hover:not(:disabled) { background: #0055aa; }
+.finder-inline button:disabled { background: #bbb; cursor: not-allowed; }
 
-@media (max-width: 720px) {
-  .finder-cards { grid-template-columns: 1fr; }
-  .finder-combo-row {
-    grid-template-columns: 1fr;
-  }
-  .finder-combo-in { display: none; }
+.finder-quick-links {
+  margin-top: 0.7rem; font-size: 0.85rem; color: #888;
+}
+.finder-quick-links a {
+  color: #0066cc; text-decoration: none;
+}
+.finder-quick-links a:hover { text-decoration: underline; }
+
+@media (max-width: 600px) {
+  .finder-inline { padding: 0.8rem; }
+  .finder-inline select { flex-basis: 100%; }
+  .finder-inline button { width: 100%; }
 }
 
 /* Details grid on availability page / how-to */

@@ -21,9 +21,6 @@ export default function LoginPage({ searchParams }: { searchParams: { next?: str
           Sign in
         </button>
       </form>
-      <p style={{ fontSize: '0.85rem', color: '#888', marginTop: '1rem' }}>
-        Set <code>ADMIN_PASSWORD</code> in <code>.env.local</code> to enable.
-      </p>
     </div>
   );
 }

@@ -115,8 +115,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
         <p>{ans.sentence}</p>
         {avail?.notes && <p><em>{avail.notes}</em></p>}
         <p className="answer-meta">
-          Last verified: <strong>{avail?.last_verified || 'unknown'}</strong>
-          {avail?.source && <> · Source: <code>{avail.source}</code></>}
+          Last verified: <strong>{avail?.last_verified || 'recently'}</strong>
         </p>
       </div>
 

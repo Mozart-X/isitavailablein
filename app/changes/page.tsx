@@ -1,7 +1,7 @@
 import { getRecentChanges, getLastScrapeAt, getScrapeActivity } from '@/lib/db';
 import type { Metadata } from 'next';
 
-export const revalidate = 600; // 10 min — surface activity faster
+export const revalidate = 600;
 
 function relTime(iso: string | null): string {
   if (!iso) return 'recently';
@@ -34,10 +34,8 @@ export default async function Page() {
     <article>
       <h1>Recent availability changes</h1>
       <p>
-        Automatic checks run every 2 hours. When a service becomes available,
-        blocked, or restricted in a country, the change is logged here. No change
-        = no row — and "no change" usually means the service is still working
-        as documented.
+        When a service becomes available, blocked, or restricted in a country,
+        the change is logged here. No change = no row.
       </p>
 
       <div className="stats-bar">
@@ -62,18 +60,15 @@ export default async function Page() {
       <h2>Status changes</h2>
       {changes.length === 0 ? (
         <p style={{ color: '#666' }}>
-          No status changes detected yet. Scrapers are running — they're just
-          not finding anything new to flip. That means the world is currently
-          stable for the services we track.
+          No status changes detected yet. The services we track are currently stable.
         </p>
       ) : (
         <>
           <p style={{ color: '#666', fontSize: '0.9rem' }}>
-            Showing {changes.length} most recent changes. Each row is a real status
-            flip detected by our scrapers vs the previous reading.
+            Showing {changes.length} most recent changes.
           </p>
           <table>
-            <thead><tr><th>When</th><th>Service</th><th>Country</th><th>Change</th><th>Source</th></tr></thead>
+            <thead><tr><th>When</th><th>Service</th><th>Country</th><th>Change</th></tr></thead>
             <tbody>
               {changes.map((c: any) => (
                 <tr key={c.id}>
@@ -81,7 +76,6 @@ export default async function Page() {
                   <td><a href={`/service/${c.service_slug}`}>{c.service_name}</a></td>
                   <td><a href={`/country/${c.country_slug}`}>{c.country_name}</a></td>
                   <td><span className={`status-badge status-${c.old_status}`}>{c.old_status || '—'}</span> → <span className={`status-badge status-${c.new_status}`}>{c.new_status}</span></td>
-                  <td style={{ fontSize: '0.85rem', color: '#888' }}>{c.source || '—'}</td>
                 </tr>
               ))}
             </tbody>
@@ -91,13 +85,9 @@ export default async function Page() {
 
       {activity.lastRunPerService.length > 0 && (
         <>
-          <h2>Latest scraper activity</h2>
-          <p style={{ color: '#666', fontSize: '0.9rem' }}>
-            Most recent successful re-check per service. Proves the scraper is alive
-            even when the changes table looks quiet.
-          </p>
+          <h2>Latest activity</h2>
           <table>
-            <thead><tr><th>Service</th><th>Last successful check</th></tr></thead>
+            <thead><tr><th>Service</th><th>Last verified</th></tr></thead>
             <tbody>
               {activity.lastRunPerService.map((r) => (
                 <tr key={r.service_slug}>
@@ -109,15 +99,6 @@ export default async function Page() {
           </table>
         </>
       )}
-
-      <h2>How verification works</h2>
-      <p>
-        For each service we track, a dedicated scraper either reads the provider's
-        official "supported countries" page, or applies a curated rule based on
-        public information (e.g. "Hulu is US-only," "Coinbase has exited Indonesia").
-        When the result differs from what's in the database, the change is recorded
-        with a timestamp and source so you can see exactly what flipped and when.
-      </p>
     </article>
   );
 }

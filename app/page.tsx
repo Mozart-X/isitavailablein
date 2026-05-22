@@ -85,7 +85,7 @@ export default async function HomePage() {
         {recentChanges.length > 0 ? (
           <>
             <p style={{ color: '#666', fontSize: '0.95rem' }}>
-              Recent status flips detected by our scrapers in the last 14 days:
+              Recent status flips detected in the last 14 days:
             </p>
             <table>
               <thead><tr><th>When</th><th>Service</th><th>Country</th><th>Change</th></tr></thead>
@@ -104,9 +104,8 @@ export default async function HomePage() {
         ) : (
           <>
             <p style={{ color: '#444', fontSize: '0.95rem' }}>
-              No status flips in the last 14 days — that means the services we track
-              are <strong>currently stable</strong> in their countries. Here's what our
-              scrapers have been doing:
+              No status flips in the last 14 days — services we track are{' '}
+              <strong>currently stable</strong> in their countries.
             </p>
             <div className="stats-bar">
               <div className="stats-bar-item">

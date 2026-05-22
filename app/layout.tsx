@@ -141,8 +141,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <nav>
             <a href="/best-vpn">Best VPN</a>
             <a href="/deals">Deals</a>
-            <a href="/services">All services</a>
-            <a href="/countries">All countries</a>
             <a href="/api-docs">API</a>
           </nav>
         </header>

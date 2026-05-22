@@ -16,7 +16,7 @@ export default function TermsPage() {
       <p>
         IsItAvailableIn.com is a free directory of service availability,
         pricing, and signup notes by country. Information is gathered from
-        public sources, scrapers, and user reports. We try to be accurate and
+        public sources, automated monitoring, and community reports. We try to be accurate and
         cite sources, but we make no warranty that any information is
         complete, current, or correct.
       </p>

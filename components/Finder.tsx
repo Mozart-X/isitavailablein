@@ -36,16 +36,14 @@ export default function Finder({ services, countries }: { services: Lite[]; coun
   return (
     <div className="finder">
       <form className="finder-inline" onSubmit={submit}>
-        <span className="finder-prefix">Is</span>
         <select value={service} onChange={(e) => setService(e.target.value)} aria-label="Service">
-          <option value="">a service…</option>
+          <option value="">Service…</option>
           {sortedServices.map((s) => (
             <option key={s.slug} value={s.slug}>{s.name}</option>
           ))}
         </select>
-        <span className="finder-prefix">available in</span>
         <select value={country} onChange={(e) => setCountry(e.target.value)} aria-label="Country">
-          <option value="">a country…</option>
+          <option value="">Country…</option>
           {sortedCountries.map((c) => (
             <option key={c.slug} value={c.slug}>{c.flag ? `${c.flag} ` : ''}{c.name}</option>
           ))}

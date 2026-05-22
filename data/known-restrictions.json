@@ -49,7 +49,7 @@
   "whatsapp-business":{ "no": ["CN","IR","KP","SY","UA"] },
   "meta-ads":  { "no": ["CN","CU","IR","KP","RU","SY"] },
   "google-ads":{ "no": ["CN","CU","IR","KP","RU","SY"] },
-  "uber":      { "no": ["CN","CU","IR","KP","SY","JP","DK","HU","BG","NP","LK","BD","VN","MA","KE"] },
+  "uber":      { "no": ["CN","CU","IR","KP","SY","DK","HU","BG","LK","BD","VN","MA","KE"] },
   "facebook":  { "no": ["CN","IR","KP","SY"], "vpn_only": ["RU"] },
   "instagram": { "no": ["CN","IR","KP","SY"], "vpn_only": ["RU"] },
   "whatsapp":  { "no": ["CN","KP","SY","UA"], "partial": ["IR","TR"] },

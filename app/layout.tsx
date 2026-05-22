@@ -142,6 +142,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <a href="/deals">Deals</a>
             <a href="/services">All services</a>
             <a href="/countries">All countries</a>
+            <a href="/api-docs">API</a>
             <a href="/hire" style={{ color: '#0066cc', fontWeight: 600 }}>Hire me</a>
           </nav>
         </header>

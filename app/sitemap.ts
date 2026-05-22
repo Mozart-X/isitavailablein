@@ -15,6 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/best-vpn`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${base}/hire`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${base}/deals`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${base}/api-docs`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${base}/review/nordvpn`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${base}/review/surfshark`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${base}/review/expressvpn`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
@@ -61,6 +62,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.85,
           });
         }
+      }
+    }
+  }
+
+  // /compare/[a]/vs/[b] — country-pair comparison pages.
+  // Mirror the hand-picked NOTABLE_PAIRS in the route file. Keep this in sync.
+  const NOTABLE_PAIRS: Record<string, string[]> = {
+    'china': ['united-states', 'singapore', 'hong-kong', 'taiwan', 'japan', 'south-korea', 'australia', 'canada', 'germany', 'united-kingdom'],
+    'india': ['united-states', 'united-kingdom', 'canada', 'australia', 'germany', 'singapore', 'united-arab-emirates', 'pakistan', 'china', 'nepal'],
+    'pakistan': ['united-arab-emirates', 'saudi-arabia', 'india', 'united-kingdom', 'united-states', 'canada', 'germany', 'australia', 'turkey', 'china'],
+    'nepal': ['india', 'united-states', 'united-kingdom', 'australia', 'canada', 'germany', 'china', 'singapore', 'japan', 'south-korea'],
+    'turkey': ['germany', 'united-states', 'united-kingdom', 'france', 'netherlands', 'russia', 'united-arab-emirates', 'canada', 'australia', 'iran'],
+    'iran': ['united-arab-emirates', 'turkey', 'germany', 'united-states', 'canada', 'united-kingdom', 'sweden', 'australia', 'netherlands', 'france'],
+    'russia': ['germany', 'turkey', 'united-states', 'united-kingdom', 'france', 'netherlands', 'canada', 'australia', 'china', 'kazakhstan'],
+    'united-states': ['canada', 'united-kingdom', 'mexico', 'germany', 'australia', 'india', 'china', 'japan', 'france', 'singapore'],
+    'united-kingdom': ['united-states', 'canada', 'australia', 'germany', 'france', 'spain', 'india', 'ireland', 'netherlands', 'portugal'],
+    'germany': ['united-states', 'united-kingdom', 'france', 'netherlands', 'spain', 'austria', 'switzerland', 'turkey', 'poland', 'italy'],
+  };
+  const countrySlugs = new Set(countries.map((c) => c.slug));
+  for (const [a, destinations] of Object.entries(NOTABLE_PAIRS)) {
+    if (!countrySlugs.has(a)) continue;
+    for (const b of destinations) {
+      if (countrySlugs.has(b) && a !== b) {
+        entries.push({
+          url: `${base}/compare/${a}/vs/${b}`,
+          lastModified: now,
+          changeFrequency: 'weekly',
+          priority: 0.75,
+        });
       }
     }
   }

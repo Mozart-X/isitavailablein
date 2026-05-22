@@ -219,8 +219,25 @@ export default async function Page({ params }: { params: { slug: string } }) {
 
       {isUnavailable && <MoneyStack serviceName={service.name} countryName={country.name} />}
 
+      {isUnavailable && (
+        <div style={{ background: '#fffbea', border: '1px solid #ffc107', borderRadius: 12, padding: '1.1rem 1.3rem', margin: '1.5rem 0' }}>
+          <strong style={{ fontSize: '1.05rem' }}>Want the step-by-step?</strong>
+          <p style={{ margin: '0.35rem 0 0' }}>
+            We have a full tutorial on{' '}
+            <a href={`/how-to-use/${service.slug}/${country.slug}`} style={{ color: '#0066cc', fontWeight: 600 }}>
+              how to use {service.name} in {country.name} →
+            </a>
+          </p>
+        </div>
+      )}
+
       <h2>Related</h2>
       <div className="grid">
+        {isUnavailable && (
+          <a href={`/how-to-use/${service.slug}/${country.slug}`}>
+            How to use {service.name} in {country.name}
+          </a>
+        )}
         <a href={`/service/${service.slug}`}>All countries for {service.name}</a>
         <a href={`/service/${service.slug}/price`}>Price by country for {service.name}</a>
         <a href={`/country/${country.slug}`}>All services in {country.name}</a>

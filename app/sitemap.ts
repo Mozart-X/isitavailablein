@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next';
-import { getAllServices, getAllCountries } from '@/lib/db';
+import { getAllServices, getAllCountries, getAvailabilityForService } from '@/lib/db';
 import { buildAvailabilitySlug } from '@/lib/url';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -44,5 +44,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
     }
   }
+
+  // /how-to-use/[service]/[country] — only for blocked/restricted combos.
+  // High priority (0.85) because these are the highest-intent affiliate pages.
+  const countryBySlug = new Map(countries.map((c) => [c.iso2, c.slug]));
+  for (const s of services) {
+    const rows = await getAvailabilityForService(s.id);
+    for (const r of rows) {
+      if (r.status === 'no' || r.status === 'partial' || r.status === 'vpn_only') {
+        const cSlug = countryBySlug.get(r.country_iso2);
+        if (cSlug) {
+          entries.push({
+            url: `${base}/how-to-use/${s.slug}/${cSlug}`,
+            lastModified: now,
+            changeFrequency: 'weekly',
+            priority: 0.85,
+          });
+        }
+      }
+    }
+  }
+
   return entries;
 }

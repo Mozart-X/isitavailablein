@@ -111,18 +111,37 @@ export async function GET(req: NextRequest) {
     return new NextResponse(lines.join('\n'), { headers: HEADERS_CSV });
   }
 
+  // Annotate each row with a derived source_type so consumers can filter
+  // by data confidence. 'official_scraped' = parsed from provider's page;
+  // 'curated' = hand-maintained list (Binance restricted persons, etc.);
+  // 'community' = derived primarily from user confirmations.
+  const annotated = rows.map((r) => ({
+    ...r,
+    source_type: deriveSourceType(r.source),
+  }));
+
   return NextResponse.json(
     {
       meta: {
-        count: rows.length,
+        count: annotated.length,
         limit,
         generated_at: new Date().toISOString(),
-        docs: 'https://isitavailablein.com/api',
-        commercial_use: 'Free for up to 1000 req/day per IP. For higher limits or paid SLA, see /api',
+        docs: 'https://isitavailablein.com/api-docs',
+        free_tier_limit: '1000 req/day per IP',
+        data_quality: 'Each row includes source and source_type. official_scraped = parsed from the provider\'s own page; curated = hand-maintained where no clean public list exists; baseline-seed = initial seed value awaiting first scrape.',
       },
       filters: { service: serviceSlug, country: iso2, status, format },
-      data: rows,
+      data: annotated,
     },
     { headers: HEADERS_JSON }
   );
+}
+
+function deriveSourceType(source: string | null): 'official_scraped' | 'curated' | 'baseline-seed' | 'unknown' {
+  if (!source) return 'unknown';
+  const s = source.toLowerCase();
+  if (s === 'baseline-seed') return 'baseline-seed';
+  if (s.includes('curated')) return 'curated';
+  if (s.includes('-page') || s.includes('-official') || s.includes('pricing-seed')) return 'official_scraped';
+  return 'curated';
 }

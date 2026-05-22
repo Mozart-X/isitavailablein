@@ -22,6 +22,22 @@ export default function ApiDocsPage() {
         feature flags, or any app that needs to know "is X available in Y."
       </p>
 
+      <h2>Data quality, honestly</h2>
+      <p style={{ background: '#fffbea', borderLeft: '3px solid #ffc107', padding: '0.7rem 1rem', borderRadius: '0 6px 6px 0' }}>
+        Every row in our response includes a <code>source_type</code> field
+        so you know exactly where the data came from:
+      </p>
+      <ul>
+        <li><strong><code>official_scraped</code></strong> — parsed from the provider&rsquo;s own published country list (ChatGPT, Claude, Netflix, Gemini, Spotify, Stripe, Coinbase, Uber). Re-verified every 2 hours.</li>
+        <li><strong><code>curated</code></strong> — for providers with no clean public country list (Binance restricted-persons rules, regional dating-app bans). Hand-maintained, last-verified date in <code>last_verified</code>.</li>
+        <li><strong><code>baseline-seed</code></strong> — initial seed value for a newly-added service awaiting its first scrape.</li>
+      </ul>
+      <p>
+        If your use case requires only first-party scraped data, filter for{' '}
+        <code>source_type=official_scraped</code> in your code. Paid tier customers can
+        request all-scraped-only data as a feed.
+      </p>
+
       <h2>Quickstart</h2>
       <pre style={{ background: '#1a1a1a', color: '#eee', padding: '1rem', borderRadius: 8, overflow: 'auto' }}>
 {`# All availability rows (default 500 max, up to 5000)

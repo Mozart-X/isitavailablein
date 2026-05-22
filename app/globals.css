@@ -127,6 +127,43 @@ main {
   .vpn-banner-cta { width: 100%; text-align: center; }
 }
 
+/* Community confirmations — the moat data widget */
+.confirm-card {
+  background: white; border: 1px solid #e5e7eb; border-radius: 12px;
+  padding: 1.1rem 1.3rem; margin: 1.5rem 0;
+}
+.confirm-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.6rem; }
+.confirm-head strong { font-size: 1.05rem; }
+.confirm-meta { font-size: 0.8rem; color: #888; }
+.confirm-stats { display: flex; flex-wrap: wrap; gap: 0.4rem 0.6rem; align-items: center; margin-bottom: 0.8rem; }
+.confirm-pill {
+  display: inline-block; font-size: 0.78rem; font-weight: 600;
+  padding: 0.2rem 0.55rem; border-radius: 999px;
+}
+.confirm-pill-yes { background: #e8f7ee; color: #0a7a3a; }
+.confirm-pill-no { background: #fce8e8; color: #a32020; }
+.confirm-pill-partial { background: #fff4d6; color: #8a6300; }
+.confirm-pill-vpn { background: #e6f0ff; color: #0a4e8a; }
+.confirm-consensus { font-size: 0.82rem; color: #666; margin-left: auto; }
+.confirm-q { font-size: 0.95rem; margin-bottom: 0.6rem; color: #333; }
+.confirm-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.confirm-btns button {
+  padding: 0.55rem 0.95rem; border: 1px solid #ccc; background: white;
+  border-radius: 8px; cursor: pointer; font-size: 0.92rem; font-weight: 500;
+}
+.confirm-btns button:hover { border-color: #0066cc; }
+.confirm-more { margin-top: 0.6rem; font-size: 0.85rem; color: #555; }
+.confirm-more summary { cursor: pointer; color: #0066cc; padding: 0.2rem 0; }
+.confirm-more input {
+  display: block; width: 100%; margin-top: 0.4rem;
+  padding: 0.45rem 0.6rem; border: 1px solid #ddd; border-radius: 6px;
+  font-size: 0.88rem; box-sizing: border-box;
+}
+.confirm-thanks {
+  background: #e8f7ee; color: #0a7a3a; padding: 0.7rem 0.9rem;
+  border-radius: 8px; font-size: 0.93rem;
+}
+
 /* Hire-me tiers */
 .hire-tiers {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));

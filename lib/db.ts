@@ -245,6 +245,40 @@ export async function queryRaw(sql: string, params: any[] = []): Promise<any[]> 
   return r.rows as any[];
 }
 
+// Community confirmation counts for a (service, country) pair.
+// Used to show the trust signal on availability pages.
+export async function getConfirmationCounts(serviceId: number, iso2: string): Promise<{
+  yes: number; no: number; partial: number; vpn_only: number;
+  total: number; recent_30d: number;
+  recent_status: { status: string; count: number }[];
+}> {
+  const empty = { yes: 0, no: 0, partial: 0, vpn_only: 0, total: 0, recent_30d: 0, recent_status: [] as { status: string; count: number }[] };
+  try {
+    const rows = await queryRaw(
+      `SELECT status, COUNT(*) AS n,
+              SUM(CASE WHEN created_at > datetime('now','-30 days') THEN 1 ELSE 0 END) AS recent
+       FROM confirmations
+       WHERE service_id = ? AND country_iso2 = ?
+       GROUP BY status`,
+      [serviceId, iso2]
+    );
+    let total = 0, recent = 0;
+    const out = { ...empty };
+    const recentByStatus: { status: string; count: number }[] = [];
+    for (const r of rows as any[]) {
+      const s = String(r.status);
+      const n = Number(r.n || 0);
+      const rec = Number(r.recent || 0);
+      total += n;
+      recent += rec;
+      if (s === 'yes' || s === 'no' || s === 'partial' || s === 'vpn_only') (out as any)[s] = n;
+      if (rec > 0) recentByStatus.push({ status: s, count: rec });
+    }
+    recentByStatus.sort((a, b) => b.count - a.count);
+    return { ...out, total, recent_30d: recent, recent_status: recentByStatus };
+  } catch { return empty; }
+}
+
 // Aggregate scrape activity stats — used to prove the scraper is alive
 // even when no status changes are detected (which is itself good news).
 export async function getScrapeActivity(): Promise<{

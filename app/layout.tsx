@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import Script from 'next/script';
+import OutboundTracker from '@/components/OutboundTracker';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://isitavailablein.com'),
@@ -143,10 +144,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <a href="/services">All services</a>
             <a href="/countries">All countries</a>
             <a href="/api-docs">API</a>
-            <a href="/hire" style={{ color: '#0066cc', fontWeight: 600 }}>Hire me</a>
           </nav>
         </header>
         <main>{children}</main>
+        <OutboundTracker />
         <footer className="site-footer">
           <p>Data updated daily from official sources. Not legal advice. <a href="/about">About</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></p>
           <p className="site-credit">Designed by Abhii 👾</p>

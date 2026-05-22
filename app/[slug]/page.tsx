@@ -1,10 +1,11 @@
 import { notFound } from 'next/navigation';
-import { getAllServices, getAllCountries, getService, getCountry, getAvailability, getPricing, getAvailabilityForCountry } from '@/lib/db';
+import { getAllServices, getAllCountries, getService, getCountry, getAvailability, getPricing, getAvailabilityForCountry, getConfirmationCounts } from '@/lib/db';
 import { parseAvailabilitySlug, buildAvailabilitySlug, statusAnswer } from '@/lib/url';
 import AdSlot from '@/components/AdSlot';
 import PriceTable from '@/components/PriceTable';
 import VpnCta from '@/components/VpnCta';
 import MoneyStack from '@/components/MoneyStack';
+import CommunityConfirm from '@/components/CommunityConfirm';
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
@@ -25,16 +26,17 @@ async function resolve(slug: string) {
   if (!parsed) return null;
   const [service, country] = await Promise.all([getService(parsed.service), getCountry(parsed.country)]);
   if (!service || !country) return null;
-  const [avail, pricing, sameCountry] = await Promise.all([
+  const [avail, pricing, sameCountry, confirmCounts] = await Promise.all([
     getAvailability(service.id, country.iso2),
     getPricing(service.id, country.iso2),
-    getAvailabilityForCountry(country.iso2)
+    getAvailabilityForCountry(country.iso2),
+    getConfirmationCounts(service.id, country.iso2)
   ]);
   // Alternatives: same category, works in this country, excluding current.
   const alternatives = sameCountry
     .filter((x) => x.category === service.category && x.service_slug !== service.slug && x.status === 'yes')
     .slice(0, 6);
-  return { service, country, avail, pricing, alternatives };
+  return { service, country, avail, pricing, alternatives, confirmCounts };
 }
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
@@ -61,7 +63,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function Page({ params }: { params: { slug: string } }) {
   const r = await resolve(params.slug);
   if (!r) notFound();
-  const { service, country, avail, pricing, alternatives } = r;
+  const { service, country, avail, pricing, alternatives, confirmCounts } = r;
   const status = avail?.status || 'unknown';
   const ans = statusAnswer(status);
   const isUnavailable = status === 'no' || status === 'vpn_only';
@@ -180,17 +182,14 @@ export default async function Page({ params }: { params: { slug: string } }) {
       <h2>About {service.name}</h2>
       <p>{service.description} <a href={service.official_url} rel="nofollow" target="_blank">Official site ↗</a></p>
 
-      <h2>Help us keep this accurate</h2>
-      <p>Are you in {country.name} right now? Tell us if {service.name} works for you:</p>
-      <div className="report-btns">
-        <form action="/api/report" method="POST">
-          <input type="hidden" name="service_id" value={service.id} />
-          <input type="hidden" name="country_iso2" value={country.iso2} />
-          <button name="status" value="yes" type="submit">✅ Works for me</button>
-          <button name="status" value="no" type="submit">❌ Blocked</button>
-          <button name="status" value="vpn_only" type="submit">🔐 Only with VPN</button>
-        </form>
-      </div>
+      <CommunityConfirm
+        serviceSlug={service.slug}
+        serviceName={service.name}
+        countryIso2={country.iso2}
+        countryName={country.name}
+        countryFlag={country.flag}
+        counts={confirmCounts}
+      />
 
       <div className="sources">
         <strong>Sources & verification:</strong>{' '}

@@ -64,6 +64,28 @@ const statements = [
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   )`,
   `CREATE INDEX IF NOT EXISTS idx_suggestions_reviewed ON suggestions(reviewed)`,
+
+  // Community confirmations — proprietary moat data.
+  // Anyone can scrape OpenAI's supported-countries page (AI can do this).
+  // Nobody else has 1,000 anonymous user confirmations of "I confirm
+  // ChatGPT works in Iran with NordVPN as of [date]". That's the moat.
+  // Plus: each new confirmation = "page updated today" signal to Google.
+  `CREATE TABLE IF NOT EXISTS confirmations (
+    id INTEGER PRIMARY KEY,
+    service_id INTEGER NOT NULL,
+    country_iso2 TEXT NOT NULL,
+    status TEXT NOT NULL,             -- yes | no | partial | vpn_only
+    vpn_used TEXT,                    -- free-text, e.g. "NordVPN" / "ExpressVPN" / "none"
+    notes TEXT,                       -- optional one-line user note
+    ip_hash TEXT,                     -- for rate limiting only
+    user_agent_hash TEXT,             -- secondary rate limit signal
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (service_id) REFERENCES services(id),
+    FOREIGN KEY (country_iso2) REFERENCES countries(iso2)
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_conf_pair ON confirmations(service_id, country_iso2)`,
+  `CREATE INDEX IF NOT EXISTS idx_conf_recent ON confirmations(created_at DESC)`,
+  `CREATE INDEX IF NOT EXISTS idx_conf_iphash ON confirmations(ip_hash)`,
 ];
 
 for (const s of statements) await tryRun(s);

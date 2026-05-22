@@ -5,27 +5,58 @@ export const runtime = 'edge';
 
 const KINDS = new Set(['service', 'country', 'feedback', 'bug', 'other']);
 
-// Common spam phrases from SEO / link-building / "we noticed your website" emails.
+// Common spam phrases from SEO / link-building / "we noticed your website" /
+// "we offer video ads" / "submit to GoogleSearchIndex" email blast templates.
 // Lowercased substrings — any match → silently drop.
 const SPAM_PATTERNS = [
+  // SEO scams
   'seo services', 'seo service', 'seo agency', 'seo expert', 'seo company',
   'first page of google', 'first page on google', 'google first page',
   'rank your website', 'rank your site', 'rank higher',
   'increase traffic', 'targeted traffic', 'organic listings',
+  'show up in web search', 'show up on web search', 'web search results',
+  'searchregister', 'googlesearchindex', 'google search index', 'search index',
+  'submit your website', 'submit your site', 'add your site', 'add your website',
+  'index your website', 'index your site',
+  // Web design / dev / video / marketing
   'web design services', 'web development services',
+  'video to advertise', 'videos can generate', 'impressive results',
+  'video ad', 'video ads for', 'video marketing',
+  'samples of our previous work', 'samples of our work', 'previous work samples',
+  'our prices start', 'prices start from', 'starts from just',
+  'considered an impactful', 'impactful video', 'attractive video',
+  'across social media',
+  // Outreach openers
   'project manager', 'account manager will contact',
   'send us "no"', 'send us " no "', 'reply with "no"', 'reply no',
-  'send you a quote', 'price list',
-  'crypto.com/exch', 'binance.com/en/activity', // referral link spam
+  'if you are not interested', "if you're not interested",
+  'send you a quote', 'price list', 'let me know if you',
+  // Referral link spam
+  'crypto.com/exch', 'binance.com/en/activity',
   'backlink', 'link building service',
   'digital marketing services',
+  // Cold open phrases
   'noticed your website', 'came across your website', 'came across your site',
-  'doesn\'t show in', 'do not show in the organic',
+  'just visited isitavailablein', 'wondered if you', 'wondered if you have',
+  "doesn't show in", 'do not show in the organic', 'do not show in organic',
+  'ever considered an',
+  // Fake "we'll add you to Google"
+  'add isitavailablein.com', 'add yourdomain', 'register your domain',
 ];
 
 // Block common spammer free-mail patterns from the contact field.
 const SPAM_EMAIL_DOMAINS = [
-  'briannawebsolution', // exact spammer hit
+  'briannawebsolution',
+  'joriggsvideo',
+  'search-isitavailablein',
+];
+
+// Quoting back the site's own domain is a tell-tale of a templated mass email.
+// Legit feedback almost never echoes the domain in the body.
+const SELF_REFERENCE_PATTERNS = [
+  'isitavailablein.com',
+  'visited isitavailablein',
+  'team isitavailablein',
 ];
 
 function looksLikeSpam(body: string, contact: string | null): string | null {
@@ -33,9 +64,17 @@ function looksLikeSpam(body: string, contact: string | null): string | null {
   for (const p of SPAM_PATTERNS) {
     if (b.includes(p)) return `pattern:${p}`;
   }
-  // Many URLs in body = spam
-  const urlMatches = b.match(/https?:\/\/|www\./g);
-  if (urlMatches && urlMatches.length >= 3) return 'too_many_urls';
+  // Body mentions our own domain → almost always a templated outreach.
+  // Legit user feedback talks about a feature/service, not about us.
+  for (const p of SELF_REFERENCE_PATTERNS) {
+    if (b.includes(p)) return `self_ref:${p}`;
+  }
+  // Count distinct URL-like tokens (https://foo or www.foo).
+  // Contact form bodies don't need links; >= 2 = almost certainly spam.
+  const urlTokens = b.match(/\bhttps?:\/\/\S+|\bwww\.\S+/g) || [];
+  if (urlTokens.length >= 2) return 'too_many_urls';
+  // Price patterns ($195, $XX USD, etc.) — almost always promotional.
+  if (/\$\s?\d{2,5}(\s?(usd|eur|gbp))?/i.test(body)) return 'price_in_body';
   // Repeating same word ≥6 times (link spam pattern)
   const words = b.split(/\s+/).filter((w) => w.length > 4);
   const counts: Record<string, number> = {};
@@ -44,6 +83,10 @@ function looksLikeSpam(body: string, contact: string | null): string | null {
   if (contact) {
     const c = contact.toLowerCase();
     for (const d of SPAM_EMAIL_DOMAINS) if (c.includes(d)) return `email:${d}`;
+  }
+  // Body addresses us by name ("Hi team", "Hey isitavailablein") — also a tell
+  if (/^(hi|hey|hello|dear|greetings)[\s,]+(team|admin|webmaster|owner|sir|mam)\b/i.test(body.trim())) {
+    return 'addressed_as_team';
   }
   return null;
 }

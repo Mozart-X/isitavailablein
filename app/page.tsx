@@ -133,13 +133,6 @@ export default async function HomePage() {
         )}
       </section>
 
-      <section>
-        <h2>Browse all</h2>
-        <p>
-          <a href="/services">All {services.length} services</a> · <a href="/countries">All {countries.length} countries</a>
-        </p>
-      </section>
-
       <SuggestForm />
     </>
   );

@@ -385,7 +385,18 @@ h2 { margin-top: 2rem; }
 .finder-card-row button:hover:not(:disabled) { background: #0055aa; }
 .finder-card-row button:disabled { background: #bbb; cursor: not-allowed; }
 
-.finder-combo { margin-top: 0.9rem; text-align: center; }
+.finder-quick-links {
+  margin-top: 0.9rem; text-align: center;
+  font-size: 0.92rem;
+}
+.finder-quick-links a {
+  color: #0066cc; font-weight: 600; text-decoration: none;
+  padding: 0.2rem 0.4rem;
+}
+.finder-quick-links a:hover { text-decoration: underline; }
+.finder-quick-sep { color: #ccc; margin: 0 0.3rem; }
+
+.finder-combo { margin-top: 0.6rem; text-align: center; }
 .finder-combo-toggle {
   background: none; border: 0; color: #0066cc; font-size: 0.9rem;
   cursor: pointer; padding: 0.4rem 0.6rem;

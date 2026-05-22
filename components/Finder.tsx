@@ -80,6 +80,12 @@ export default function Finder({ services, countries }: { services: Lite[]; coun
         </form>
       </div>
 
+      <div className="finder-quick-links">
+        <a href="/services">All services →</a>
+        <span className="finder-quick-sep">·</span>
+        <a href="/countries">All countries →</a>
+      </div>
+
       <div className="finder-combo">
         <button
           type="button"

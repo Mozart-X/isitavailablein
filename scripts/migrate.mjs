@@ -160,11 +160,85 @@ try {
   console.error('Service ensure step failed (non-fatal):', e.message);
 }
 
-// --- Apply manual overrides ---
-// data/manual-overrides.json contains explicit corrections for cells where
-// the scraper output is unreliable (JS-rendered pages) or where a recent
-// real-world change isn't yet on the provider's official page.
-// Forces UPDATE every migration run (not IGNORE) so corrections take effect.
+// --- Community consensus auto-flip ---
+// Real users in real countries beat any scraper. When 3+ community
+// confirmations in the last 30 days agree on a status different from
+// what's in the DB, flip the DB to match the community.
+// Result: stale cells self-correct as soon as enough real users report.
+// No manual overrides, no code touches, no prompts needed.
+//
+// Rules:
+//   - Min 3 confirmations in last 30 days for that (service, country)
+//   - Majority status >= 60% of recent reports
+//   - Majority status != current DB status
+//   - Source becomes 'community-consensus' with the confirmation count
+//   - Logged to change_log so it appears on /changes
+try {
+  const today = new Date().toISOString().slice(0, 10);
+  const rows = await client.execute(`
+    SELECT
+      service_id,
+      country_iso2,
+      status,
+      COUNT(*) AS n
+    FROM confirmations
+    WHERE created_at > datetime('now','-30 days')
+    GROUP BY service_id, country_iso2, status
+  `);
+
+  // Aggregate per (service, country) pair
+  const byPair = new Map();
+  for (const r of rows.rows) {
+    const k = `${r.service_id}|${r.country_iso2}`;
+    if (!byPair.has(k)) byPair.set(k, { total: 0, byStatus: {}, service_id: Number(r.service_id), country_iso2: String(r.country_iso2) });
+    const agg = byPair.get(k);
+    agg.byStatus[String(r.status)] = Number(r.n);
+    agg.total += Number(r.n);
+  }
+
+  let flipped = 0;
+  for (const agg of byPair.values()) {
+    if (agg.total < 3) continue; // need minimum signal
+    // Find majority status
+    let topStatus = null, topCount = 0;
+    for (const [s, n] of Object.entries(agg.byStatus)) {
+      if (n > topCount) { topStatus = s; topCount = n; }
+    }
+    const ratio = topCount / agg.total;
+    if (ratio < 0.6) continue; // no clear consensus
+
+    // Compare with current DB status
+    const cur = await client.execute({
+      sql: 'SELECT status FROM availability WHERE service_id = ? AND country_iso2 = ?',
+      args: [agg.service_id, agg.country_iso2]
+    });
+    const currentStatus = cur.rows[0]?.status || null;
+    if (currentStatus === topStatus) continue; // already agrees
+
+    // Flip the DB to match the community
+    const source = `community-consensus:${topCount}/${agg.total}`;
+    await client.execute({
+      sql: `UPDATE availability
+            SET status = ?, source = ?, last_verified = ?
+            WHERE service_id = ? AND country_iso2 = ?`,
+      args: [topStatus, source, today, agg.service_id, agg.country_iso2]
+    });
+    // Log to change_log so it surfaces on /changes
+    await client.execute({
+      sql: `INSERT INTO change_log (service_id, country_iso2, old_status, new_status, source)
+            VALUES (?, ?, ?, ?, ?)`,
+      args: [agg.service_id, agg.country_iso2, currentStatus, topStatus, source]
+    });
+    flipped++;
+  }
+  console.log(`Community consensus: flipped ${flipped} cells`);
+} catch (e) {
+  console.error('Community consensus step failed (non-fatal):', e.message);
+}
+
+// --- Manual overrides (emergency only, deprecated path) ---
+// Use community confirmations instead. Kept as last-resort for the
+// bootstrap period before community data exists for a given cell.
 try {
   const overridesPath = path.join(root, 'data', 'manual-overrides.json');
   if (fs.existsSync(overridesPath)) {

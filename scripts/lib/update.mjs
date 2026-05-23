@@ -53,8 +53,13 @@ export async function applyUpdate(serviceSlug, source, statusByIso) {
     let changed = 0, unchanged = 0, skipped = 0;
     for (const [iso, newStatus] of Object.entries(statusByIso || {})) {
       if (!validIso.has(iso)) { skipped++; continue; }
-      const existing = await query('SELECT status FROM availability WHERE service_id = ? AND country_iso2 = ?', [serviceId, iso]);
+      const existing = await query('SELECT status, source FROM availability WHERE service_id = ? AND country_iso2 = ?', [serviceId, iso]);
       const oldStatus = existing[0]?.status || null;
+      const oldSource = existing[0]?.source || null;
+      // Community consensus wins. If the current row was set by community
+      // confirmations (real users in real countries), don't let a scraper
+      // overwrite it — the migration's consensus step will re-evaluate next run.
+      if (oldSource && oldSource.startsWith('community-consensus')) { skipped++; continue; }
       if (oldStatus === newStatus) {
         await run('UPDATE availability SET last_verified = ?, source = ? WHERE service_id = ? AND country_iso2 = ?',
           [today, source, serviceId, iso]);

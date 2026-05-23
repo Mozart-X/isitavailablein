@@ -1,0 +1,6 @@
+{
+  "_comment": "Explicit overrides for cells where scraper output is unreliable (JS-rendered pages) or where a recent change isn't yet reflected on the provider's public page. Applied on EVERY migration run as a forced UPDATE. To correct any cell: add an entry here, push. Next scrape cycle picks it up.",
+  "uber": {
+    "NP": { "status": "yes", "note": "Uber launched in Nepal May 2026; cities page is JS-rendered so scraper can't extract NP automatically" }
+  }
+}

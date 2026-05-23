@@ -160,5 +160,38 @@ try {
   console.error('Service ensure step failed (non-fatal):', e.message);
 }
 
+// --- Apply manual overrides ---
+// data/manual-overrides.json contains explicit corrections for cells where
+// the scraper output is unreliable (JS-rendered pages) or where a recent
+// real-world change isn't yet on the provider's official page.
+// Forces UPDATE every migration run (not IGNORE) so corrections take effect.
+try {
+  const overridesPath = path.join(root, 'data', 'manual-overrides.json');
+  if (fs.existsSync(overridesPath)) {
+    const overrides = JSON.parse(fs.readFileSync(overridesPath, 'utf8'));
+    const today = new Date().toISOString().slice(0, 10);
+    let applied = 0;
+    for (const [serviceSlug, byCountry] of Object.entries(overrides)) {
+      if (serviceSlug.startsWith('_')) continue;
+      const svc = await client.execute({ sql: 'SELECT id FROM services WHERE slug = ?', args: [serviceSlug] });
+      if (!svc.rows.length) { console.warn(`override: unknown service ${serviceSlug}`); continue; }
+      const serviceId = Number(svc.rows[0].id);
+      for (const [iso2, val] of Object.entries(byCountry || {})) {
+        if (typeof val !== 'object' || !val || !val.status) continue;
+        await client.execute({
+          sql: `UPDATE availability
+                SET status = ?, source = ?, last_verified = ?
+                WHERE service_id = ? AND country_iso2 = ?`,
+          args: [val.status, 'manual-override', today, serviceId, iso2]
+        });
+        applied++;
+      }
+    }
+    console.log(`Manual overrides applied: ${applied} cells`);
+  }
+} catch (e) {
+  console.error('Manual overrides step failed (non-fatal):', e.message);
+}
+
 console.log('migration done');
 process.exit(0);

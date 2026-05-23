@@ -15,7 +15,40 @@ Schema per entry:
 
 ---
 
-## 2026-05-23 (latest)
+## 2026-05-24 (latest)
+
+| | Now | Δ vs prev period |
+|---|---|---|
+| 7d users | **66** | flat (same as 5/23) |
+| 7d new users | 71 | flat |
+| 7d pageviews | 106 | flat |
+| 1-day users | 4 | flat |
+| **30-day cumulative** | **134** | flat (vs 5/23) — was 127 → 134 over 24h |
+| Clicks tracked | 2 | flat |
+| **Form starts** | **3** | **+200%** (someone interacted with Finder/Suggest/Confirm) |
+
+**Top geo (7d):** US 27 · China 5 · Germany 5 · France 5 · Nigeria 3 · Canada 2 · Egypt 2 (unchanged from 5/23)
+**Sources:** Direct 43 · Organic 22 · Unassigned 7 · Referral 2
+**Top page (views):** Homepage 30 · Reddit Norway 8 · Claude Ukraine 7 · YouTube Peru 3 · Facebook Chile 2
+**Realtime now:** 1 active user from Nepal (likely user testing the Uber-NP fix)
+
+**Sovrn:** Still "Under review" — no movement past their 1-3 day promise. Click the "Contact support" link to escalate.
+**Admin:**
+- 70 / 61 / 4,270 / 0 failed scrapes (7d)
+- **Total changes logged: 44** ↑ (was 26 — +18 new flips this week)
+- **Pending suggestions: 0** ↑ (was 2 — user cleared spam)
+- Pending reports: 2 (still the Snapchat-Syria duplicates — needs reject)
+
+**Notes:**
+- Traffic plateaued (66 users for 2nd consecutive week). New content hasn't broken into rankings yet.
+- 18 new change_log entries this week → could be scrapers catching real movement OR new pages going through migrate's seed step. Worth checking /changes to see if real-world flips are appearing.
+- form_start jumped 3 → likely first community confirmation submissions! Once 3+ for a single pair land, the new consensus auto-flip kicks in.
+- Many code-side improvements shipped: tutorial route, API+widget, community confirmations + auto-consensus, real scrapers (5 converted), ETag caching, hourly cron, OG images, anti-spam tightening, manual overrides, autonomous self-correction loop.
+- Code side is "done" structurally. Now waiting on distribution (backlinks, social shares, Sovrn approval).
+
+---
+
+## 2026-05-23
 
 | | Now | Δ vs prev period |
 |---|---|---|

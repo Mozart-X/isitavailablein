@@ -95,6 +95,25 @@ const statements = [
     last_modified TEXT,
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
   )`,
+
+  // Email alert subscriptions (newsletter + targeted change alerts).
+  // The owned-audience layer. Compounds with traffic and eventually
+  // unlocks newsletter sponsorship revenue.
+  `CREATE TABLE IF NOT EXISTS alert_subs (
+    id INTEGER PRIMARY KEY,
+    kind TEXT NOT NULL,            -- 'targeted' or 'digest'
+    email TEXT NOT NULL,
+    email_hash TEXT NOT NULL,
+    service_id INTEGER,            -- null for digest subs
+    country_iso2 TEXT,             -- null for digest subs
+    confirmed INTEGER NOT NULL DEFAULT 0,
+    ip_hash TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    last_sent_at TEXT
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_alert_kind ON alert_subs(kind)`,
+  `CREATE INDEX IF NOT EXISTS idx_alert_pair ON alert_subs(service_id, country_iso2)`,
+  `CREATE INDEX IF NOT EXISTS idx_alert_email ON alert_subs(email_hash)`,
 ];
 
 for (const s of statements) await tryRun(s);

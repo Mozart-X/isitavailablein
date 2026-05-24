@@ -139,8 +139,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <header className="site-header">
           <a href="/" className="logo">IsItAvailableIn<span>.com</span></a>
           <nav>
+            <a href="/me">My country</a>
+            <a href="/best-vpn-quiz">VPN quiz</a>
             <a href="/best-vpn">Best VPN</a>
             <a href="/deals">Deals</a>
+            <a href="/alerts">Alerts</a>
             <a href="/api-docs">API</a>
           </nav>
         </header>

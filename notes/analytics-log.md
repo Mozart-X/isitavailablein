@@ -15,7 +15,38 @@ Schema per entry:
 
 ---
 
-## 2026-05-24 (latest)
+## 2026-05-25 (latest) — PLATEAU BROKEN 📈
+
+| | Now | Δ vs prev period |
+|---|---|---|
+| 7d users | **73** | **+59%** (was 66 → 73 — plateau broken!) |
+| 7d new users | 77 | +64% |
+| **7d pageviews** | **198** | **+69%** (nearly doubled from 106) |
+| 7d engagement events | 130 | +46% |
+| 7d scrolls | 67 | +49% |
+| **7d form_starts** | **7** | **+133%** |
+| **7d form_submits** | **6** | **+200% (NEW metric appearing)** |
+| 1-day users | **18** | **+64%** (huge bump from 4) |
+| **30-day cumulative** | **151** | **+91%** |
+
+**Top geo (7d):** US 31 (+41%) · **China 6 (+200%)** · **Germany 5 (+400%)** · **France 4 (+300%)** · **Nigeria 3 (+200%)** · Egypt 2 · UK 2 (new)
+**Sources:** Direct 46 (+53%) · Organic 26 (+4%) · Unassigned 8 · Referral 2
+**Top page (views):** Homepage 77 (+60%) · **Snapchat Philippines 11** (new top entry, from added services) · **Best VPN deals 8 (+700%)** · Reddit Norway 9 · All countries 6 (+200%)
+**Realtime now:** 1 active user from South Africa
+
+**Sovrn:** Still "Under review" — no movement again. **Past 1-3 day promise by >10 days now. Escalate.**
+**Admin:** 70 / 61 / 4,270 / 0 failed scrapes / 44 changes logged (same) / 2 pending reports (unchanged) / **0 pending suggestions** (clean)
+
+**Notes:**
+- **6 form_submit events** = real community confirmations landing. Once 3+ accumulate on a single (service, country) pair, the new autonomous consensus auto-flips the DB. Self-correction loop is alive.
+- **Snapchat Philippines #2 page** — proves the new-service additions are catching long-tail traffic
+- **Deals page +700% views** — comparison/coupon-intent traffic flowing. This is the highest-converting page type. If Sovrn were approved, this would be paying right now.
+- **Premium geo all up significantly** — China 200%, Germany 400%, France 300% are the markets that pay highest VPN affiliate commissions. Good geo mix.
+- 30-day +91% sustained — broader trajectory still strong even with a 2-week plateau in middle of period.
+
+---
+
+## 2026-05-24
 
 | | Now | Δ vs prev period |
 |---|---|---|

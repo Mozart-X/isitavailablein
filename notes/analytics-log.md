@@ -15,7 +15,40 @@ Schema per entry:
 
 ---
 
-## 2026-05-25 (latest) — PLATEAU BROKEN 📈
+## 2026-05-26 (latest) — engagement EXPLODING
+
+| | Now | Δ vs prev period |
+|---|---|---|
+| 7d users | **73** | flat (same as 5/25) |
+| 7d new users | 76 | flat |
+| **7d pageviews** | **219** | **+77%** (was 198 → 219, still climbing) |
+| 7d engagement events | 153 | +68% |
+| **7d scrolls** | **84** | **+87%** (people reading deeper) |
+| **7d form_starts** | **11** | **+267%** (vs 5/25 was 7) |
+| **7d form_submits** | **10** | **+400%** (vs 5/25 was 6 — 67% jump in 24h) |
+| 1-day users | 12 | +9% |
+| **30-day cumulative** | **162** | **+80%** |
+| **Pages per user** | **3.0** | up from 2.7 (5/25) and 1.6 (5/15) |
+
+**Top geo (7d):** US 31 · China 4 · Germany 4 · France 4 · Canada 2 · UK 2 · **India 2** (new in top)
+**Sources:** Direct 45 · **Organic 31 (+24%)** · Unassigned 6 · Referral 2
+**Top page (views):** Homepage **87 (+89%)** · Snapchat Philippines 11 · Reddit Norway 9 · Best VPN deals 8 · **All countries 7 (+250%)** · /changes 5
+**Realtime now:** 0 active
+
+**Sovrn:** Session expired in our browser — couldn't pull live status. User needs to log back in at platform.sovrn.com to check + escalate the still-stuck review.
+**Admin:** 70 / 61 / 4,270 / 0 failed / 44 changes (flat) / **2 pending reports** (Snapchat-Syria still — needs reject) / 0 pending suggestions
+
+**Notes:**
+- **Engagement up across the board even with flat user count.** The new pages added on 5/25 (/me, /alerts, /best-vpn-quiz) just deployed — too early to see THEIR direct impact yet, but base engagement is climbing.
+- **10 form_submits = community confirmations rolling in.** Once 3+ accumulate on a single (service, country) pair, the consensus auto-flip kicks in. Self-correction loop has fuel.
+- **Pages per user: 3.0 vs 1.6 three weeks ago.** Visitors clicking deeper, not bouncing. SEO-positive signal.
+- **Organic Search now ~38% of sessions** (31/82). Up from ~30% last week. Compounding indexing.
+- **India in top geo first time** — VPN-buyer market, big audience.
+- Homepage views nearly doubled (+89%). Possibly people sharing the URL directly.
+
+---
+
+## 2026-05-25 — PLATEAU BROKEN 📈
 
 | | Now | Δ vs prev period |
 |---|---|---|

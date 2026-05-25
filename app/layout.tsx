@@ -104,7 +104,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
-        <link rel="alternate" type="application/rss+xml" title="Recent availability changes" href="/changes/rss.xml" />
+        <link rel="alternate" type="application/rss+xml" title="Recent availability changes (RSS)" href="/changes/rss.xml" />
+        <link rel="alternate" type="application/feed+json" title="Recent availability changes (JSON Feed)" href="/changes/feed.json" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

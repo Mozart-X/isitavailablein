@@ -15,7 +15,47 @@ Schema per entry:
 
 ---
 
-## 2026-05-26 (latest) — engagement EXPLODING
+## 2026-05-27 (latest)
+
+| | Now | Δ vs yesterday | Δ vs prev period (chart) |
+|---|---|---|---|
+| 7d users | **64** | **−12%** (73 → 64) | −13.5% (week-over-week down) |
+| 7d new users | 65 | −14% | −17% |
+| 7d pageviews | 212 | −3% (219 → 212) | **+104%** vs prev period |
+| 7d engagement events | 157 | flat | +234% vs prev period |
+| 7d scrolls | 87 | +4% | +278% vs prev period |
+| **7d form_starts** | **12** | +9% | **+500%** |
+| **7d form_submits** | **12** | **+20%** (10 → 12) | **+500%** |
+| 1-day | 13 | +8% | +19% |
+| **30-day cumulative** | **179** | **+10%** | **+53%** |
+
+**Top geo (7d):** US 26 · **Canada 4 (+300%)** · China 3 · Germany 2 · **Denmark 2 (new)** · UK 2 · India 2
+**Sources:** Direct 35 · **Organic Search 34 (+55%)** ↑ (31 → 34) · Unassigned 8 · **Referral 3** ↑ (2 → 3)
+**Top page (views):** Homepage **93 (+343%)** ⬆ · Snapchat Philippines 11 · Best VPN deals 8 · Reddit Norway 1 ⬇ · Claude Ukraine 1 ⬇ · Facebook Chile 0 ⬇
+**Realtime now:** 0 active
+
+**Sovrn:** Browser tab stuck on error page — couldn't pull live status. Likely session expired again. User: log in at platform.sovrn.com to check + escalate.
+**Admin:** 70 / 61 / 4,270 / 0 failed / 44 changes (flat) / **0 pending reports** ✓ (user cleared Snapchat-Syria duplicates) / 0 pending suggestions
+
+**Notes:**
+- **First week-over-week decline since plateau broke.** 73 → 64 users (-12%). Possible reasons:
+  1. Sample noise — single weeks can drift ±15% randomly
+  2. Old long-tail pages (Reddit Norway, Claude Ukraine, Facebook Chile) all dropped sharply — Google may have reshuffled rankings
+  3. New pages (/me, /alerts, /quiz) just deployed; not yet ranked
+- **Counter-signals are positive though:**
+  - Organic Search up 55% vs prev period
+  - Referrals doubled (1 → 3 sessions) — someone's actively linking somewhere
+  - 30-day cumulative +53% — monthly trajectory intact
+  - Homepage +343% — direct traffic spike (someone sharing the URL?)
+  - **Canada +300%** new growth market
+  - **Denmark in top geo first time**
+- **Engagement still strong:** 12 form_submits (highest ever), 87 scrolls, 157 engagement events
+- New /me + /alerts + /best-vpn-quiz pages too new to evaluate (deployed 5/25)
+- New RSS + JSON Feed + Discord bot endpoint (5/27 commit `82c99bb`) — too early for impact
+
+---
+
+## 2026-05-26 — engagement EXPLODING
 
 | | Now | Δ vs prev period |
 |---|---|---|

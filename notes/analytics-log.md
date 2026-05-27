@@ -15,7 +15,39 @@ Schema per entry:
 
 ---
 
-## 2026-05-27 (latest)
+## 2026-05-28 (latest)
+
+| | Now | Δ vs yesterday |
+|---|---|---|
+| 7d users | **66** | +3% (64 → 66 — small recovery) |
+| 7d new users | 67 | +3% |
+| 7d pageviews | 214 | +1% |
+| 7d engagement events | 158 | +1% |
+| 7d scrolls | 87 | flat |
+| 7d form_starts | 12 | flat |
+| 7d form_submits | 12 | flat |
+| 1-day yesterday | **15** | +15% (13 → 15) |
+| **30-day cumulative** | **181** | **+1%** |
+
+**Top geo (7d):** US 27 · **Canada 4** · China 3 · Germany 2 · **Denmark 2** · UK 2 · India 2
+**Sources:** Direct 36 · **Organic Search 35 (+59% vs prev period)** ↑ · Unassigned 5 · Referral 3
+**Top page (views):** Homepage 93 · Snapchat Philippines 11 · Best VPN deals 8 · Reddit Norway 1 · Claude Ukraine 1
+**Realtime now:** 1 active from US
+
+**Sovrn:** Still **"Under review"** — **15+ days past 1-3 day promise.** Click "Contact support" in the dashboard and escalate. This is the active revenue blocker.
+**Admin:** 70 / 61 / 4,270 / 0 failed scrapes / 44 changes (flat) / 0 pending reports / 0 pending suggestions
+
+**Notes:**
+- **Recovery from yesterday's dip.** 64 → 66 users (+3%). Within noise band but trending right way.
+- **Yesterday alone was 15 users** — second-strongest single day in site history.
+- **Organic Search up to 35 sessions** (+59% vs prev period). Continues to climb.
+- **30-day at 181** (+55% rolling). Monthly trajectory still strong despite the weekly dip earlier this period.
+- Distribution layer shipped 5/27 (RSS + JSON Feed + Discord) — too new for impact metrics.
+- The 12 form_submits accumulated last week haven't triggered any community-consensus auto-flips yet (44 changes count is unchanged) — likely no single (service, country) pair has hit the min-3 threshold yet. As traffic grows, threshold gets hit.
+
+---
+
+## 2026-05-27
 
 | | Now | Δ vs yesterday | Δ vs prev period (chart) |
 |---|---|---|---|

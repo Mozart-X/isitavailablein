@@ -38,10 +38,11 @@ export default async function HomePage() {
     getScrapeActivity()
   ]);
 
-  // Filter to changes from the last 14 days. Older changes are stale on the
-  // homepage — they make the site look frozen. If none are recent, we show
-  // a live activity dashboard instead.
-  const recentCutoff = Date.now() - 14 * 24 * 3600 * 1000;
+  // Filter to changes from the last 3 days. Older changes are stale on the
+  // homepage — they make the same Uber/Stripe batch from a week ago look
+  // like "fresh news" every visit. If none are recent, we show a live
+  // activity dashboard instead.
+  const recentCutoff = Date.now() - 3 * 24 * 3600 * 1000;
   const recentChanges = changes.filter((c: any) => {
     const t = new Date(String(c.changed_at).replace(' ', 'T') + 'Z').getTime();
     return !isNaN(t) && t > recentCutoff;

@@ -15,7 +15,39 @@ Schema per entry:
 
 ---
 
-## 2026-05-28 (latest)
+## 2026-05-29 (latest)
+
+| | Now | Δ vs yesterday |
+|---|---|---|
+| 7d users | **61** | **−8%** (66 → 61) |
+| 7d new users | 62 | −7% |
+| 7d pageviews | 208 | −3% |
+| 7d engagement events | 153 | −3% |
+| 7d scrolls | 88 | +1% |
+| 7d form_starts | 12 | flat |
+| 7d form_submits | 12 | flat |
+| 1-day yesterday | **7** | **−53%** (15 → 7) — soft day |
+| **30-day cumulative** | **183** | **+1%** (181 → 183) — still climbing |
+
+**Top geo (7d):** US 23 · Canada 4 · **UK 4 (+300%)** ↑ · China 3 · Germany 2 · Denmark 2 · **Malaysia 2 (new in top)**
+**Sources:** Direct 34 · Organic 34 (−1 vs y'day, +42% vs prev period) · Unassigned 6 · Referral 3
+**Top page (views):** Homepage 92 · Snapchat Philippines 11 · Best VPN deals 8 · Reddit Norway 1 · Claude Ukraine 1 · **Facebook Taiwan 1 (new)**
+**Realtime now:** 0 active
+
+**Sovrn:** Still **"Under review"** — **16+ days past 1-3 day promise.** Code can't unstick this. Manual escalation only.
+**Admin:** 70 / 61 / 4,270 / 0 failed / 44 changes (flat) / 0 pending reports / 0 pending suggestions
+
+**Notes:**
+- **Soft day yesterday** (7 users) after Sunday's strong 15. Weekly count dipped 66 → 61.
+- **But 30-day cumulative still climbing** (181 → 183). Monthly average remains positive.
+- **UK 4 (+300%)** and **Malaysia 2 (new)** — fresh geo emerging.
+- **Organic Search held at 34** — slight tick down but +42% over prior period.
+- Same dynamic as the past few days: old long-tail pages suppressed (Reddit Norway 1, Claude Ukraine 1, Facebook Chile 0), new homepage taking most of the traffic.
+- form_submits still at 12 weekly — community signal flowing but no single (service, country) pair has hit min-3 threshold to auto-flip.
+
+---
+
+## 2026-05-28
 
 | | Now | Δ vs yesterday |
 |---|---|---|

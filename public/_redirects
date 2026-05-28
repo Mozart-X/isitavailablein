@@ -8,3 +8,10 @@
 # Old dash-form canonical mistakenly published in our metadata.
 # Wildcard catches /apps-banned-in-china → /apps-banned-in/china etc.
 /apps-banned-in-:country   /apps-banned-in/:country   301
+
+# Canonical RSS / JSON Feed URLs with file extensions → real routes.
+# next-on-pages doesn't compile route folders that contain dots, so the
+# routes live at /changes/rss and /changes/feed. RSS readers expect the
+# extensioned URL; we rewrite (200) so they get the feed at the canonical path.
+/changes/rss.xml    /changes/rss     200
+/changes/feed.json  /changes/feed    200

@@ -119,23 +119,39 @@ async function handleCommand(name: string, options: any[]) {
   }
 }
 
+// Browser GET — returns a friendly placeholder so route registers + humans
+// who hit the URL directly see something useful, not a 404.
+export async function GET() {
+  return NextResponse.json({
+    name: 'IsItAvailableIn — Discord interactions endpoint',
+    description: 'POST endpoint for Discord slash-command interactions. Configured for the /iia command. Direct GET requests are not supported.',
+    docs: 'https://isitavailablein.com/api-docs',
+    configured: !!process.env.DISCORD_PUBLIC_KEY,
+  });
+}
+
 export async function POST(req: NextRequest) {
-  const body = await req.text();
-  const valid = await verifySignature(req, body);
-  if (!valid) {
-    return new NextResponse('invalid signature', { status: 401 });
+  let body = '';
+  try {
+    body = await req.text();
+    const valid = await verifySignature(req, body);
+    if (!valid) {
+      return new NextResponse('invalid signature', { status: 401 });
+    }
+    const payload = JSON.parse(body);
+    if (payload.type === PING) {
+      return NextResponse.json({ type: PONG });
+    }
+    if (payload.type === APPLICATION_COMMAND) {
+      const data = payload.data || {};
+      const result = await handleCommand(data.name, data.options);
+      return NextResponse.json({
+        type: CHANNEL_MESSAGE_WITH_SOURCE,
+        data: result,
+      });
+    }
+    return new NextResponse('unsupported', { status: 400 });
+  } catch (e: any) {
+    return NextResponse.json({ error: 'discord_handler_error', message: e?.message || 'unknown' }, { status: 500 });
   }
-  const payload = JSON.parse(body);
-  if (payload.type === PING) {
-    return NextResponse.json({ type: PONG });
-  }
-  if (payload.type === APPLICATION_COMMAND) {
-    const data = payload.data || {};
-    const result = await handleCommand(data.name, data.options);
-    return NextResponse.json({
-      type: CHANNEL_MESSAGE_WITH_SOURCE,
-      data: result,
-    });
-  }
-  return new NextResponse('unsupported', { status: 400 });
 }

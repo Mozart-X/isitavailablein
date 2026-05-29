@@ -27,7 +27,7 @@ export async function GET() {
     version: 'https://jsonfeed.org/version/1.1',
     title: 'IsItAvailableIn — Recent availability changes',
     home_page_url: `${base}/changes`,
-    feed_url: `${base}/changes/feed.json`,
+    feed_url: `${base}/changes/feed`,
     description: 'Services that launched, were blocked, or changed status in any country worldwide.',
     language: 'en-us',
     items,

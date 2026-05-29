@@ -46,7 +46,7 @@ export async function GET() {
   <channel>
     <title>IsItAvailableIn — Recent availability changes</title>
     <link>${base}/changes</link>
-    <atom:link href="${base}/changes/rss.xml" rel="self" type="application/rss+xml"/>
+    <atom:link href="${base}/changes/rss" rel="self" type="application/rss+xml"/>
     <description>Automatic feed of services that launched, were blocked, or changed status in any country worldwide.</description>
     <language>en-us</language>
     <lastBuildDate>${lastBuild}</lastBuildDate>

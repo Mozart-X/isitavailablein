@@ -19,10 +19,13 @@ const EZOIC_ENABLED = process.env.NEXT_PUBLIC_EZOIC_ENABLED;
 const PLAUSIBLE = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID; // e.g. G-XXXXXXXXXX
 const CF_BEACON = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN; // Cloudflare Web Analytics token
-// Sovrn Commerce (formerly VigLink): auto-monetizes outbound links to thousands
-// of merchants via one signup. The default below is the user's Sovrn ID;
-// override via env var if you ever rotate.
-const SOVRN_ID = process.env.NEXT_PUBLIC_SOVRN_ID || '4139c3824c3211b7c02d4b3a981dd485';
+// Auto-affiliate link layer (Sovrn / Skimlinks / VigLink). Only loads if
+// an env var is explicitly set. Sovrn denied the site 2026-05-30 citing
+// 'quality/security/transparency' (standard rejection for templated
+// programmatic-SEO sites). Hardcoded key removed; pivot to Skimlinks in
+// progress. If you switch networks, set NEXT_PUBLIC_SOVRN_ID with the new
+// key OR replace the script src below with the new network's URL.
+const SOVRN_ID = process.env.NEXT_PUBLIC_SOVRN_ID;
 // Adsterra: display ad network with no traffic minimum. Set the JS direct-link
 // or banner zone ID once approved. We render their script if set.
 const ADSTERRA_KEY = process.env.NEXT_PUBLIC_ADSTERRA_KEY;

@@ -15,7 +15,52 @@ Schema per entry:
 
 ---
 
-## 2026-05-29 (latest)
+## 2026-05-30 (latest) — **SOVRN DENIED. Pivot to Skimlinks.**
+
+### Sovrn outcome
+
+After the escalation email yesterday, Sovrn actually responded — by **denying** the site.
+
+Quote: *"Your property is ineligible. isitavailablein.com does not currently meet our merchant requirements for either quality, security, or transparency."*
+
+Translation: standard rejection language for programmatic-SEO sites with templated pages. 4,670 similar-looking auto-generated pages may have triggered "content farm" classification.
+
+Action taken (commit `316a053`+): removed hardcoded Sovrn JS key from layout.tsx so the broken script stops loading on every page.
+
+**Pivot plan: Skimlinks** (https://skimlinks.com/publishers/apply). More tolerant of templated content than Sovrn, broader merchant network in some cases.
+
+### Today's GA numbers (7-day window, 22-28 May)
+
+| | Now | Δ vs yesterday |
+|---|---|---|
+| 7d users | **61** | flat |
+| 7d new users | 62 | flat |
+| **7d pageviews** | **217** | **+4%** (208 → 217) |
+| 7d engagement events | 162 | +6% |
+| **7d scrolls** | **91** | +3% |
+| **7d form_starts** | **13** | +8% (12 → 13) |
+| 7d form_submits | 12 | flat |
+| 1-day yesterday | **4** | −43% (7 → 4) — soft day |
+| **30-day cumulative** | **184** | +1% (183 → 184) |
+
+**Top geo (7d):** US 23 · Canada 4 · China 4 · UK 4 · **Syria 3 (+200%, new in top!)** · Denmark 2 · Malaysia 2
+**Sources:** Direct 35 · **Organic Search 35 (+59%)** ↑ tied with Direct for first time · Unassigned 6 · Referral 2
+**Top page (views):** Homepage 96 · Snapchat Philippines 11 · **All countries 9 (new in top)** · **All services 8 (new in top)** · Best VPN deals 8
+**Realtime now:** 0 active
+
+**Admin:** 70 / 61 / 4,270 / 0 failed / 44 changes (flat) / 0 pending reports / 0 pending suggestions
+
+**Notes:**
+- **Sovrn denied** — the active revenue blocker is now also denied. Pivot needed.
+- **Organic Search reached parity with Direct** (both 35) for first time. Continued SEO grind paying off.
+- **Syria entered top geo** (+200%) — restricted-country audience, ideal for VPN affiliate (when affiliate exists)
+- **All services + All countries pages in top 4** — internal navigation getting heavy use
+- **Form_starts at 13** (all-time high) — engagement layer continues working
+- **30-day cumulative at 184** (+41%) — monthly trajectory unbroken throughout the Sovrn drama
+
+---
+
+## 2026-05-29
 
 | | Now | Δ vs yesterday |
 |---|---|---|

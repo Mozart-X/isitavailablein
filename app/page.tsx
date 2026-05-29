@@ -1,4 +1,4 @@
-import { getAllServices, getAllCountries, getRecentChanges, getLastScrapeAt, getScrapeActivity } from '@/lib/db';
+import { getAllServices, getAllCountries, getRecentChanges, getLastScrapeAt, getScrapeActivity, getRecentPriceChanges } from '@/lib/db';
 import { buildAvailabilitySlug } from '@/lib/url';
 import Finder from '@/components/Finder';
 import SuggestForm from '@/components/SuggestForm';
@@ -30,12 +30,13 @@ function relTime(iso: string | null): string {
 }
 
 export default async function HomePage() {
-  const [services, countries, changes, lastScrape, activity] = await Promise.all([
+  const [services, countries, changes, lastScrape, activity, priceDrops] = await Promise.all([
     getAllServices(),
     getAllCountries(),
     getRecentChanges(8),
     getLastScrapeAt(),
-    getScrapeActivity()
+    getScrapeActivity(),
+    getRecentPriceChanges(6, true)
   ]);
 
   // Filter to changes from the last 3 days. Older changes are stale on the
@@ -130,6 +131,40 @@ export default async function HomePage() {
               <a href="/changes">See full change history →</a>
             </p>
           </>
+        )}
+      </section>
+
+      <section>
+        <h2>💸 Recent price drops</h2>
+        {priceDrops.length > 0 ? (
+          <>
+            <p style={{ color: '#666', fontSize: '0.95rem', marginTop: 0 }}>
+              Subscriptions that just got cheaper in some country:
+            </p>
+            <table>
+              <thead><tr><th>Service</th><th>Country</th><th>Now</th></tr></thead>
+              <tbody>
+                {priceDrops.map((d) => (
+                  <tr key={d.id}>
+                    <td><a href={`/cheapest/${d.service_slug}`}>{d.service_name}</a></td>
+                    <td>{d.flag ? `${d.flag} ` : ''}{d.country_name}</td>
+                    <td>
+                      <span style={{ color: '#888' }}>${d.old_usd?.toFixed(2)}</span>{' → '}
+                      <strong style={{ color: '#0a7d33' }}>${d.new_usd?.toFixed(2)}</strong>
+                      {d.pct != null && <span style={{ color: '#0a7d33', fontWeight: 600 }}> ({d.pct}%)</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p style={{ fontSize: '0.85rem', color: '#888', marginTop: '0.5rem' }}>
+              <a href="/cheapest">Track prices & get drop alerts →</a>
+            </p>
+          </>
+        ) : (
+          <p style={{ color: '#444', fontSize: '0.95rem' }}>
+            Find the <a href="/cheapest">cheapest country for every subscription</a> — and get an email the moment a price drops.
+          </p>
         )}
       </section>
 

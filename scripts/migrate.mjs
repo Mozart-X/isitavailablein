@@ -53,6 +53,39 @@ const statements = [
   `CREATE INDEX IF NOT EXISTS idx_pricing_service ON pricing(service_id)`,
   `CREATE INDEX IF NOT EXISTS idx_pricing_country ON pricing(country_iso2)`,
 
+  // Price history — append-only snapshot of price_usd whenever it changes.
+  // Powers sparklines + "lowest ever" + the proof behind "dropped X%".
+  `CREATE TABLE IF NOT EXISTS price_history (
+    id INTEGER PRIMARY KEY,
+    service_id INTEGER NOT NULL,
+    country_iso2 TEXT NOT NULL,
+    tier TEXT NOT NULL DEFAULT 'standard',
+    price_local REAL,
+    currency_local TEXT,
+    price_usd REAL,
+    recorded_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_phist_pair ON price_history(service_id, country_iso2, tier)`,
+  `CREATE INDEX IF NOT EXISTS idx_phist_recent ON price_history(recorded_at DESC)`,
+
+  // Price change events — the movement feed + what price alerts fire on.
+  // direction: 'drop' | 'rise'. Mirrors change_log but for prices.
+  `CREATE TABLE IF NOT EXISTS price_log (
+    id INTEGER PRIMARY KEY,
+    service_id INTEGER NOT NULL,
+    country_iso2 TEXT NOT NULL,
+    tier TEXT NOT NULL DEFAULT 'standard',
+    old_usd REAL,
+    new_usd REAL,
+    pct REAL,
+    direction TEXT,
+    changed_at TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (service_id) REFERENCES services(id),
+    FOREIGN KEY (country_iso2) REFERENCES countries(iso2)
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_plog_recent ON price_log(changed_at DESC)`,
+  `CREATE INDEX IF NOT EXISTS idx_plog_service ON price_log(service_id)`,
+
   // Suggestions / feedback / contact
   `CREATE TABLE IF NOT EXISTS suggestions (
     id INTEGER PRIMARY KEY,
@@ -114,6 +147,15 @@ const statements = [
   `CREATE INDEX IF NOT EXISTS idx_alert_kind ON alert_subs(kind)`,
   `CREATE INDEX IF NOT EXISTS idx_alert_pair ON alert_subs(service_id, country_iso2)`,
   `CREATE INDEX IF NOT EXISTS idx_alert_email ON alert_subs(email_hash)`,
+  // One-click unsubscribe token (every email links to it) + a per-sub
+  // watermark so the notifier never re-sends the same event twice.
+  `ALTER TABLE alert_subs ADD COLUMN unsub_token TEXT`,
+  `ALTER TABLE alert_subs ADD COLUMN last_notified_id INTEGER NOT NULL DEFAULT 0`,
+  `ALTER TABLE alert_subs ADD COLUMN unsubscribed INTEGER NOT NULL DEFAULT 0`,
+  `CREATE INDEX IF NOT EXISTS idx_alert_token ON alert_subs(unsub_token)`,
+
+  // Backfill tokens for any rows created before this column existed.
+  `UPDATE alert_subs SET unsub_token = lower(hex(randomblob(16))) WHERE unsub_token IS NULL OR unsub_token = ''`,
 ];
 
 for (const s of statements) await tryRun(s);

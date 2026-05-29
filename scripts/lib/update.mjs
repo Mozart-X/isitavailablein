@@ -110,9 +110,22 @@ export async function applyPricing(serviceSlug, source, rows) {
     const serviceId = Number(svcRows[0].id);
     const countries = await query('SELECT iso2 FROM countries');
     const validIso = new Set(countries.map((c) => c.iso2));
-    let wrote = 0, skipped = 0;
+    let wrote = 0, skipped = 0, moved = 0;
     for (const r of rows || []) {
       if (!validIso.has(r.iso)) { skipped++; continue; }
+      const tier = r.tier || 'standard';
+      const newUsd = r.price_usd ?? null;
+
+      // Read the previous price so we can detect movement.
+      const prev = await query(
+        'SELECT price_usd FROM pricing WHERE service_id = ? AND country_iso2 = ? AND tier = ?',
+        [serviceId, r.iso, tier]
+      );
+      const oldUsd = prev.length ? (prev[0].price_usd == null ? null : Number(prev[0].price_usd)) : null;
+      const isNew = prev.length === 0;
+      // "Changed" means we had a USD price before and it differs by >= 1 cent.
+      const changed = !isNew && oldUsd != null && newUsd != null && Math.abs(newUsd - oldUsd) >= 0.01;
+
       await run(
         `INSERT INTO pricing (service_id, country_iso2, tier, price_local, currency_local, price_usd, period, source, updated_at)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
@@ -123,11 +136,31 @@ export async function applyPricing(serviceSlug, source, rows) {
            period=excluded.period,
            source=excluded.source,
            updated_at=excluded.updated_at`,
-        [serviceId, r.iso, r.tier || 'standard', r.price_local ?? null, r.currency ?? null, r.price_usd ?? null, r.period || 'month', source]
+        [serviceId, r.iso, tier, r.price_local ?? null, r.currency ?? null, newUsd, r.period || 'month', source]
       );
       wrote++;
+
+      // Append a history snapshot on first sight and on every real change.
+      if ((isNew || changed) && newUsd != null) {
+        await run(
+          `INSERT INTO price_history (service_id, country_iso2, tier, price_local, currency_local, price_usd)
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [serviceId, r.iso, tier, r.price_local ?? null, r.currency ?? null, newUsd]
+        );
+      }
+      // Log the move (drop/rise) — this is what the feed + price alerts read.
+      if (changed) {
+        const pct = oldUsd ? Math.round(((newUsd - oldUsd) / oldUsd) * 1000) / 10 : null;
+        const direction = newUsd < oldUsd ? 'drop' : 'rise';
+        await run(
+          `INSERT INTO price_log (service_id, country_iso2, tier, old_usd, new_usd, pct, direction)
+           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [serviceId, r.iso, tier, oldUsd, newUsd, pct, direction]
+        );
+        moved++;
+      }
     }
-    console.log(`[pricing:${serviceSlug}] wrote=${wrote} skipped=${skipped}`);
+    console.log(`[pricing:${serviceSlug}] wrote=${wrote} moved=${moved} skipped=${skipped}`);
     await logRun(serviceSlug, `${source}:pricing`, true, { changed: wrote, unchanged: 0, skipped });
     return { wrote, skipped };
   } catch (e) {

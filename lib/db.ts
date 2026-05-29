@@ -225,6 +225,106 @@ export async function getPricingForService(serviceId: number): Promise<Pricing[]
   return (await cache()).pricing.filter((p) => p.service_id === serviceId);
 }
 
+export type PriceChange = {
+  id: number;
+  service_id: number;
+  country_iso2: string;
+  tier: string;
+  old_usd: number | null;
+  new_usd: number | null;
+  pct: number | null;
+  direction: 'drop' | 'rise' | string;
+  changed_at: string;
+  service_name: string;
+  service_slug: string;
+  country_name: string;
+  country_slug: string;
+  flag: string;
+};
+
+// Recent price movements (drops + rises) for the feed. Fresh-ish — uses the
+// 5-min cache via a direct query; cheap enough to run uncached.
+export async function getRecentPriceChanges(limit = 20, dropsOnly = false): Promise<PriceChange[]> {
+  try {
+    const rows = await queryRaw(
+      `SELECT pl.*, s.name AS service_name, s.slug AS service_slug,
+              co.name AS country_name, co.slug AS country_slug, co.flag AS flag
+       FROM price_log pl
+       JOIN services s ON pl.service_id = s.id
+       JOIN countries co ON pl.country_iso2 = co.iso2
+       ${dropsOnly ? "WHERE pl.direction = 'drop'" : ''}
+       ORDER BY pl.changed_at DESC LIMIT ?`,
+      [limit]
+    );
+    return rows.map((r: any) => ({
+      ...r,
+      id: Number(r.id),
+      service_id: Number(r.service_id),
+      old_usd: r.old_usd == null ? null : Number(r.old_usd),
+      new_usd: r.new_usd == null ? null : Number(r.new_usd),
+      pct: r.pct == null ? null : Number(r.pct),
+    })) as PriceChange[];
+  } catch { return []; }
+}
+
+export type CheapestRow = {
+  service: Service;
+  cheapest_usd: number;
+  cheapest_iso2: string;
+  cheapest_country: string;
+  cheapest_slug: string;
+  dearest_usd: number;
+  savings_pct: number;
+  countries: number;
+};
+
+// Per-service cheapest country + max savings %, for the /cheapest hub ranking.
+// Built from the in-memory cache — no extra DB round-trips.
+export async function getCheapestPerService(): Promise<CheapestRow[]> {
+  const c = await cache();
+  const out: CheapestRow[] = [];
+  for (const svc of c.services) {
+    const prices = c.pricing.filter((p) => p.service_id === svc.id && p.price_usd != null);
+    if (prices.length < 2) continue; // need a spread to show "savings"
+    // cheapest tier per country
+    const byCountry = new Map<string, number>();
+    for (const p of prices) {
+      const cur = byCountry.get(p.country_iso2);
+      if (cur == null || (p.price_usd as number) < cur) byCountry.set(p.country_iso2, p.price_usd as number);
+    }
+    const entries = [...byCountry.entries()].sort((a, b) => a[1] - b[1]);
+    if (entries.length < 2) continue;
+    const [cheapIso, cheapUsd] = entries[0];
+    const dearUsd = entries[entries.length - 1][1];
+    if (dearUsd <= 0) continue;
+    const ctry = c.countryByIso.get(cheapIso);
+    out.push({
+      service: svc,
+      cheapest_usd: cheapUsd,
+      cheapest_iso2: cheapIso,
+      cheapest_country: ctry?.name || cheapIso,
+      cheapest_slug: ctry?.slug || '',
+      dearest_usd: dearUsd,
+      savings_pct: Math.round(((dearUsd - cheapUsd) / dearUsd) * 100),
+      countries: entries.length,
+    });
+  }
+  return out.sort((a, b) => b.savings_pct - a.savings_pct);
+}
+
+// Price history snapshots for a (service, country) — oldest→newest, for sparklines.
+export async function getPriceHistory(serviceId: number, iso2: string, tier = 'standard'): Promise<{ price_usd: number; recorded_at: string }[]> {
+  try {
+    const rows = await queryRaw(
+      `SELECT price_usd, recorded_at FROM price_history
+       WHERE service_id = ? AND country_iso2 = ? AND tier = ? AND price_usd IS NOT NULL
+       ORDER BY recorded_at ASC LIMIT 60`,
+      [serviceId, iso2, tier]
+    );
+    return rows.map((r: any) => ({ price_usd: Number(r.price_usd), recorded_at: String(r.recorded_at) }));
+  } catch { return []; }
+}
+
 // Most recent successful scrape timestamp (ISO string). Fresh query — don't cache.
 export async function getLastScrapeAt(): Promise<string | null> {
   try {

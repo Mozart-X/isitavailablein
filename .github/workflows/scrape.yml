@@ -22,4 +22,13 @@ jobs:
         env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+      # Send alert emails for status flips / price drops detected above.
+      # No-ops safely if RESEND_API_KEY isn't set (subs are still collected).
+      - run: npm run notify
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ALERT_FROM: ${{ secrets.ALERT_FROM }}
+          SITE_URL: https://isitavailablein.com
       # No CF Pages rebuild hook — site reads Turso live via edge runtime + 5min in-memory cache.

@@ -11,7 +11,10 @@ import { exec, queryRaw } from '@/lib/db';
 
 export const runtime = 'edge';
 
-const KINDS = new Set(['targeted', 'digest']);
+// 'targeted' = specific service+country status flip
+// 'digest'   = weekly summary of everything
+// 'price'    = price drop for a service (any country); service optional = all
+const KINDS = new Set(['targeted', 'digest', 'price']);
 
 async function hash(s: string): Promise<string> {
   const salt = process.env.IP_SALT || 'default-salt';
@@ -40,6 +43,7 @@ export async function POST(req: NextRequest) {
   if (kind === 'targeted' && (!serviceSlug || !iso2)) {
     return NextResponse.json({ ok: false, error: 'missing_target' }, { status: 400 });
   }
+  // 'price' subs: service is optional (blank = all services), country ignored.
 
   const ip = req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown';
   const ipHash = await hash(ip);
@@ -55,17 +59,20 @@ export async function POST(req: NextRequest) {
   } catch {}
 
   try {
-    // Resolve service_id if targeted
+    // Resolve service_id if provided
     let serviceId: number | null = null;
     if (serviceSlug) {
       const svc = await queryRaw('SELECT id FROM services WHERE slug = ?', [serviceSlug]);
       if (!svc.length) return NextResponse.json({ ok: false, error: 'unknown_service' }, { status: 400 });
       serviceId = Number((svc[0] as any).id);
     }
+    // price subs ignore country; one-click-unsubscribe token per sub.
+    const subCountry = kind === 'price' ? null : iso2;
+    const token = crypto.randomUUID().replace(/-/g, '');
     await exec(
-      `INSERT INTO alert_subs (kind, email, email_hash, service_id, country_iso2, ip_hash)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [kind, email, emailHash, serviceId, iso2, ipHash]
+      `INSERT INTO alert_subs (kind, email, email_hash, service_id, country_iso2, ip_hash, unsub_token)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [kind, email, emailHash, serviceId, subCountry, ipHash, token]
     );
   } catch {
     // ignore — silent success keeps spammers from probing

@@ -144,6 +144,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <a href="/" className="logo">IsItAvailableIn<span>.com</span></a>
           <nav>
             <a href="/me">My country</a>
+            <a href="/cheapest">Cheapest</a>
             <a href="/best-vpn-quiz">VPN quiz</a>
             <a href="/best-vpn">Best VPN</a>
             <a href="/deals">Deals</a>

@@ -43,13 +43,13 @@ async function verifySignature(req: NextRequest, body: string): Promise<boolean>
   try {
     const key = await crypto.subtle.importKey(
       'raw',
-      hexToBytes(pubKey),
+      hexToBytes(pubKey) as BufferSource,
       { name: 'Ed25519' } as any,
       false,
       ['verify']
     );
-    const sigBytes = hexToBytes(signature);
-    const data = new TextEncoder().encode(timestamp + body);
+    const sigBytes = hexToBytes(signature) as BufferSource;
+    const data = new TextEncoder().encode(timestamp + body) as BufferSource;
     return await crypto.subtle.verify({ name: 'Ed25519' } as any, key, sigBytes, data);
   } catch {
     return false;

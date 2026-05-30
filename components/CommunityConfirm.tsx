@@ -51,7 +51,7 @@ export default function CommunityConfirm({ serviceSlug, serviceName, countryIso2
     : null;
 
   return (
-    <aside className="confirm-card">
+    <aside className="confirm-card" id="confirm-card">
       <div className="confirm-head">
         <strong>Community confirmations</strong>
         <span className="confirm-meta">

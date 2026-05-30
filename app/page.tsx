@@ -68,6 +68,10 @@ export default async function HomePage() {
           services={services.map((s) => ({ slug: s.slug, name: s.name, category: s.category }))}
           countries={countries.map((c) => ({ slug: c.slug, name: c.name, iso2: c.iso2, flag: c.flag }))}
         />
+        <p style={{ marginTop: '0.75rem' }}>
+          <a href="/live" style={{ fontWeight: 600, color: '#b00' }}>🔴 See what’s blocked right now →</a>
+          {' '}<span style={{ color: '#888' }}>live community reports + working VPNs</span>
+        </p>
       </section>
 
       <section>

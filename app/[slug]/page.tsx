@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getAllServices, getAllCountries, getService, getCountry, getAvailability, getPricing, getAvailabilityForCountry, getConfirmationCounts } from '@/lib/db';
+import { getAllServices, getAllCountries, getService, getCountry, getAvailability, getPricing, getAvailabilityForCountry, getConfirmationCounts, getWorkingMethods } from '@/lib/db';
 import { parseAvailabilitySlug, buildAvailabilitySlug, statusAnswer } from '@/lib/url';
 import AdSlot from '@/components/AdSlot';
 import PriceTable from '@/components/PriceTable';
@@ -26,17 +26,18 @@ async function resolve(slug: string) {
   if (!parsed) return null;
   const [service, country] = await Promise.all([getService(parsed.service), getCountry(parsed.country)]);
   if (!service || !country) return null;
-  const [avail, pricing, sameCountry, confirmCounts] = await Promise.all([
+  const [avail, pricing, sameCountry, confirmCounts, workingMethods] = await Promise.all([
     getAvailability(service.id, country.iso2),
     getPricing(service.id, country.iso2),
     getAvailabilityForCountry(country.iso2),
-    getConfirmationCounts(service.id, country.iso2)
+    getConfirmationCounts(service.id, country.iso2),
+    getWorkingMethods(service.id, country.iso2)
   ]);
   // Alternatives: same category, works in this country, excluding current.
   const alternatives = sameCountry
     .filter((x) => x.category === service.category && x.service_slug !== service.slug && x.status === 'yes')
     .slice(0, 6);
-  return { service, country, avail, pricing, alternatives, confirmCounts };
+  return { service, country, avail, pricing, alternatives, confirmCounts, workingMethods };
 }
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
@@ -63,10 +64,17 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function Page({ params }: { params: { slug: string } }) {
   const r = await resolve(params.slug);
   if (!r) notFound();
-  const { service, country, avail, pricing, alternatives, confirmCounts } = r;
+  const { service, country, avail, pricing, alternatives, confirmCounts, workingMethods } = r;
   const status = avail?.status || 'unknown';
   const ans = statusAnswer(status);
   const isUnavailable = status === 'no' || status === 'vpn_only';
+
+  function methodAgo(iso: string): string {
+    const t = new Date(String(iso).replace(' ', 'T') + 'Z').getTime();
+    if (isNaN(t)) return '';
+    const d = Math.round((Date.now() - t) / 86400000);
+    return d <= 0 ? 'today' : d === 1 ? 'yesterday' : `${d}d ago`;
+  }
 
   const friction = avail?.signup_friction;
   const payOk = avail?.payment_ok;
@@ -121,6 +129,25 @@ export default async function Page({ params }: { params: { slug: string } }) {
 
       {isUnavailable && (
         <VpnCta variant="banner" serviceName={service.name} countryName={country.name} />
+      )}
+
+      {workingMethods.length > 0 && (
+        <div className="working-now">
+          <h2 style={{ marginTop: 0 }}>✅ What’s working right now in {country.name}</h2>
+          <p style={{ margin: '0 0 0.6rem', color: '#555', fontSize: '0.92rem' }}>
+            Methods real users confirmed for {service.name} recently — freshest first:
+          </p>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '0.4rem' }}>
+            {workingMethods.map((m) => (
+              <li key={m.vpn} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff', border: '1px solid #d7ead9', borderRadius: 8, padding: '0.5rem 0.75rem' }}>
+                <span><strong style={{ color: '#0a7d33' }}>{m.vpn}</strong> <span style={{ color: '#888', fontSize: '0.85rem' }}>· {m.count} confirm{m.count > 1 ? 's' : ''} · {methodAgo(m.last_at)}</span></span>
+              </li>
+            ))}
+          </ul>
+          <p style={{ margin: '0.6rem 0 0', fontSize: '0.85rem', color: '#888' }}>
+            Community-reported, not guaranteed. <a href="#confirm-card">Confirm what worked for you →</a>
+          </p>
+        </div>
       )}
 
       {hasAnyDetail && (

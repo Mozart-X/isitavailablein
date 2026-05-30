@@ -379,6 +379,144 @@ export async function getConfirmationCounts(serviceId: number, iso2: string): Pr
   } catch { return empty; }
 }
 
+// ── Live status layer (the "DownDetector for geo-blocks" engine) ──────────
+// All built on the existing confirmations stream — no schema change.
+
+export type TrendingPair = {
+  service: Service | undefined;
+  country: Country | undefined;
+  total: number;
+  no: number;
+  vpn_only: number;
+  yes: number;
+  partial: number;
+  blocked_pct: number;
+  verdict: 'blocked' | 'vpn_only' | 'working' | 'partial';
+  last_at: string;
+};
+
+// Pairs with the most community reports in the last N hours — the live board.
+// "verdict" is the majority recent status; blocked_pct drives the red/green.
+export async function getTrendingReports(hours = 48, limit = 12): Promise<TrendingPair[]> {
+  try {
+    const c = await cache();
+    const rows = await queryRaw(
+      `SELECT service_id, country_iso2,
+              COUNT(*) AS total,
+              SUM(CASE WHEN status='no' THEN 1 ELSE 0 END) AS no,
+              SUM(CASE WHEN status='vpn_only' THEN 1 ELSE 0 END) AS vpn_only,
+              SUM(CASE WHEN status='yes' THEN 1 ELSE 0 END) AS yes,
+              SUM(CASE WHEN status='partial' THEN 1 ELSE 0 END) AS partial,
+              MAX(created_at) AS last_at
+       FROM confirmations
+       WHERE created_at > datetime('now', ?)
+       GROUP BY service_id, country_iso2
+       ORDER BY total DESC, last_at DESC
+       LIMIT ?`,
+      [`-${hours} hours`, limit]
+    );
+    return (rows as any[]).map((r) => {
+      const total = Number(r.total) || 0;
+      const no = Number(r.no) || 0, vpn_only = Number(r.vpn_only) || 0;
+      const yes = Number(r.yes) || 0, partial = Number(r.partial) || 0;
+      const counts: [TrendingPair['verdict'], number][] = [
+        ['blocked', no], ['vpn_only', vpn_only], ['working', yes], ['partial', partial],
+      ];
+      counts.sort((a, b) => b[1] - a[1]);
+      return {
+        service: c.serviceById.get(Number(r.service_id)),
+        country: c.countryByIso.get(String(r.country_iso2)),
+        total, no, vpn_only, yes, partial,
+        blocked_pct: total ? Math.round(((no + vpn_only) / total) * 100) : 0,
+        verdict: counts[0][0],
+        last_at: String(r.last_at),
+      };
+    }).filter((p) => p.service && p.country);
+  } catch { return []; }
+}
+
+export type WorkingMethod = { vpn: string; count: number; last_at: string };
+
+// Which VPNs/methods recent users say WORK for a pair — ranked. The single
+// most valuable, perishable, monetizable datapoint we own.
+export async function getWorkingMethods(serviceId: number, iso2: string, days = 21): Promise<WorkingMethod[]> {
+  try {
+    const rows = await queryRaw(
+      `SELECT vpn_used AS vpn, COUNT(*) AS n, MAX(created_at) AS last_at
+       FROM confirmations
+       WHERE service_id = ? AND country_iso2 = ?
+         AND status IN ('yes','vpn_only')
+         AND vpn_used IS NOT NULL AND TRIM(vpn_used) != ''
+         AND created_at > datetime('now', ?)
+       GROUP BY vpn_used COLLATE NOCASE
+       ORDER BY n DESC, last_at DESC
+       LIMIT 5`,
+      [serviceId, iso2, `-${days} days`]
+    );
+    return (rows as any[]).map((r) => ({ vpn: String(r.vpn), count: Number(r.n) || 0, last_at: String(r.last_at) }));
+  } catch { return []; }
+}
+
+export type LiveReport = {
+  service: Service | undefined;
+  country: Country | undefined;
+  status: string;
+  vpn_used: string | null;
+  notes: string | null;
+  created_at: string;
+};
+
+// Newest individual reports — the live ticker. Anonymized (no IP/UA).
+export async function getRecentReports(limit = 15): Promise<LiveReport[]> {
+  try {
+    const c = await cache();
+    const rows = await queryRaw(
+      `SELECT service_id, country_iso2, status, vpn_used, notes, created_at
+       FROM confirmations ORDER BY created_at DESC LIMIT ?`,
+      [limit]
+    );
+    return (rows as any[]).map((r) => ({
+      service: c.serviceById.get(Number(r.service_id)),
+      country: c.countryByIso.get(String(r.country_iso2)),
+      status: String(r.status),
+      vpn_used: r.vpn_used ? String(r.vpn_used) : null,
+      notes: r.notes ? String(r.notes) : null,
+      created_at: String(r.created_at),
+    })).filter((r) => r.service && r.country);
+  } catch { return []; }
+}
+
+export type KnownBlock = {
+  service: Service;
+  blocked: number;     // countries fully blocked
+  vpn_only: number;    // countries VPN-only
+  restricted: number;  // blocked + vpn_only
+  sample: { country: Country; status: string }[];
+};
+
+// Baseline "known restrictions" from real availability data, so the live
+// board is useful and SEO-rich even with zero community reports today.
+// Honest: labeled as known restrictions, not "live outages".
+export async function getKnownBlocks(limit = 15): Promise<KnownBlock[]> {
+  const c = await cache();
+  const out: KnownBlock[] = [];
+  for (const svc of c.services) {
+    const rows = c.availBySvc.get(svc.id) || [];
+    let blocked = 0, vpn_only = 0;
+    const sample: { country: Country; status: string }[] = [];
+    for (const a of rows) {
+      if (a.status === 'no' || a.status === 'vpn_only') {
+        if (a.status === 'no') blocked++; else vpn_only++;
+        const ctry = c.countryByIso.get(a.country_iso2);
+        if (ctry && sample.length < 6) sample.push({ country: ctry, status: a.status });
+      }
+    }
+    const restricted = blocked + vpn_only;
+    if (restricted > 0) out.push({ service: svc, blocked, vpn_only, restricted, sample });
+  }
+  return out.sort((a, b) => b.restricted - a.restricted).slice(0, limit);
+}
+
 // Aggregate scrape activity stats — used to prove the scraper is alive
 // even when no status changes are detected (which is itself good news).
 export async function getScrapeActivity(): Promise<{

@@ -429,3 +429,10 @@ h2 { margin-top: 2rem; }
   border-radius: 8px; font-size: 0.95rem; cursor: pointer; font-weight: 600;
 }
 .suggest-thanks { border-color: #0a6b28; background: #f0fdf4; }
+
+/* Live "what's working now" block on availability pages */
+.working-now {
+  background: #f0fdf4; border: 1px solid #bbe8c4; border-radius: 12px;
+  padding: 1.1rem 1.3rem; margin: 1.25rem 0;
+}
+.working-now h2 { font-size: 1.15rem; }

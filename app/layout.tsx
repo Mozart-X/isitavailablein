@@ -143,6 +143,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <header className="site-header">
           <a href="/" className="logo">IsItAvailableIn<span>.com</span></a>
           <nav>
+            <a href="/live">🔴 Live status</a>
             <a href="/me">My country</a>
             <a href="/cheapest">Cheapest</a>
             <a href="/best-vpn-quiz">VPN quiz</a>

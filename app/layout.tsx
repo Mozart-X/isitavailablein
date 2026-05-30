@@ -143,20 +143,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <header className="site-header">
           <a href="/" className="logo">IsItAvailableIn<span>.com</span></a>
           <nav>
-            <a href="/live">🔴 Live status</a>
             <a href="/me">My country</a>
-            <a href="/cheapest">Cheapest</a>
-            <a href="/best-vpn-quiz">VPN quiz</a>
             <a href="/best-vpn">Best VPN</a>
             <a href="/deals">Deals</a>
-            <a href="/alerts">Alerts</a>
-            <a href="/api-docs">API</a>
           </nav>
         </header>
         <main>{children}</main>
         <OutboundTracker />
         <footer className="site-footer">
-          <p>Data updated daily from official sources. Not legal advice. <a href="/about">About</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></p>
+          <p><a href="/cheapest">Cheapest country</a> · <a href="/best-vpn-quiz">VPN quiz</a> · <a href="/alerts">Alerts</a> · <a href="/api-docs">API</a></p>
+          <p>Not legal advice. <a href="/about">About</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></p>
           <p className="site-credit">Designed by Abhii 👾</p>
         </footer>
       </body>

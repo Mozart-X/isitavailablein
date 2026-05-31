@@ -2,17 +2,23 @@ name: Scrape
 
 on:
   schedule:
-    - cron: '0 * * * *'  # every hour
+    # Every 6 hours. Hourly (private repo) burned the free GitHub Actions
+    # minute quota, which made every run fail in ~3s once the cap was hit.
+    # Availability data changes ~monthly, so 6h is more than fresh enough
+    # and uses ~6x fewer minutes.
+    - cron: '0 */6 * * *'
   workflow_dispatch:
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'   # cache deps so npm ci is seconds, not ~18s — fewer minutes/run
       - run: npm ci
       - run: npm run migrate
         env:

@@ -8,3 +8,6 @@ out
 .DS_Store
 .claude/
 tsconfig.tsbuildinfo
+# Private working notes (analytics numbers, account IDs) — keep OUT of the
+# now-public repo. Files stay on disk locally; just untracked.
+notes/

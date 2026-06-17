@@ -47,7 +47,11 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const status = avail?.status || 'unknown';
   const ans = statusAnswer(status);
   const title = `Is ${service.name} available in ${country.name}? (${ans.word})`;
-  const description = `${ans.sentence} Last verified ${avail?.last_verified || 'recently'}. See sources, alternatives, and how to access ${service.name} in ${country.name}.`;
+  // Only claim freshness in the search snippet when the row is genuinely
+  // verified (scraped/community). Baseline reference data must not imply a check.
+  const verifiedSrc = /^(official|community-consensus)/.test(avail?.source || '');
+  const freshness = verifiedSrc && avail?.last_verified ? ` Last checked ${avail.last_verified}.` : '';
+  const description = `${ans.sentence}${freshness} See sources, alternatives, and how to access ${service.name} in ${country.name}.`;
   const ogVariant = status === 'no' || status === 'vpn_only' ? 'blocked' : status === 'yes' ? 'available' : 'default';
   const ogTitle = `${service.name} in ${country.flag} ${country.name}: ${ans.word}`;
   const ogSub = status === 'no' ? 'Blocked — see workarounds' : status === 'vpn_only' ? 'VPN required — see best VPNs' : status === 'partial' ? 'Partially available — see details' : 'Available — see pricing';
@@ -122,9 +126,19 @@ export default async function Page({ params }: { params: { slug: string } }) {
         </div>
         <p>{ans.sentence}</p>
         {avail?.notes && <p><em>{avail.notes}</em></p>}
-        <p className="answer-meta">
-          Last verified: <strong>{avail?.last_verified || 'recently'}</strong>
-        </p>
+        {/^(official|community-consensus)/.test(avail?.source || '') ? (
+          <p className="answer-meta">
+            {(avail?.source || '').startsWith('community-consensus')
+              ? 'Confirmed by community reports'
+              : 'Auto-checked from the official source'}
+            {' · last checked '}<strong>{avail?.last_verified || 'recently'}</strong>
+          </p>
+        ) : (
+          <p className="answer-meta data-reference">
+            Reference data — <strong>not continuously verified</strong>, so it can lag real-world
+            changes (temporary bans, new restrictions). <a href="#confirm-card">Know the current status in {country.name}? Confirm below ↓</a>
+          </p>
+        )}
       </div>
 
       {isUnavailable && (

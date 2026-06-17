@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     default: 'IsItAvailableIn — Check service availability by country',
     template: '%s | IsItAvailableIn'
   },
-  description: 'Find out if ChatGPT, Netflix, Revolut, Binance and 50+ services are available in your country. Updated daily.',
+  description: 'Find out if ChatGPT, Netflix, Revolut, Binance and 50+ services are available in your country — with workarounds, local pricing, and live community reports.',
   openGraph: { type: 'website', siteName: 'IsItAvailableIn' },
   twitter: { card: 'summary_large_image' },
   robots: { index: true, follow: true }

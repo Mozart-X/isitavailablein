@@ -436,3 +436,10 @@ h2 { margin-top: 2rem; }
   padding: 1.1rem 1.3rem; margin: 1.25rem 0;
 }
 .working-now h2 { font-size: 1.15rem; }
+
+/* Honest provenance note on availability pages — caution, not authority */
+.answer-meta.data-reference {
+  color: #8a6d00; background: #fffbea; border: 1px solid #ffe08a;
+  border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.9rem;
+}
+.answer-meta.data-reference a { color: #0066cc; font-weight: 600; }

@@ -60,6 +60,6 @@ export function isHighValue(opts: {
   if (status && status !== 'yes' && status !== 'unknown') return true; // no / vpn_only / partial
   if (iso2 && RESTRICTED_ISO.has(iso2)) return true;
   if (hasPricing) return true;
-  if (/^(official|community-consensus)/.test(source || '')) return true;
+  if (/^(official|community-consensus|ooni)/.test(source || '')) return true;
   return false;
 }

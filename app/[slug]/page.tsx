@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const title = `Is ${service.name} available in ${country.name}? (${ans.word})`;
   // Only claim freshness in the search snippet when the row is genuinely
   // verified (scraped/community). Baseline reference data must not imply a check.
-  const verifiedSrc = /^(official|community-consensus)/.test(avail?.source || '');
+  const verifiedSrc = /^(official|community-consensus|ooni)/.test(avail?.source || '');
   const freshness = verifiedSrc && avail?.last_verified ? ` Last checked ${avail.last_verified}.` : '';
   const description = `${ans.sentence}${freshness} See sources, alternatives, and how to access ${service.name} in ${country.name}.`;
   const ogVariant = status === 'no' || status === 'vpn_only' ? 'blocked' : status === 'yes' ? 'available' : 'default';
@@ -132,11 +132,13 @@ export default async function Page({ params }: { params: { slug: string } }) {
         </div>
         <p>{ans.sentence}</p>
         {avail?.notes && <p><em>{avail.notes}</em></p>}
-        {/^(official|community-consensus)/.test(avail?.source || '') ? (
+        {/^(official|community-consensus|ooni)/.test(avail?.source || '') ? (
           <p className="answer-meta">
-            {(avail?.source || '').startsWith('community-consensus')
-              ? 'Confirmed by community reports'
-              : 'Auto-checked from the official source'}
+            {(avail?.source || '').startsWith('ooni')
+              ? `📡 Measured from inside ${country.name} (OONI network data)`
+              : (avail?.source || '').startsWith('community-consensus')
+                ? 'Confirmed by community reports'
+                : 'Auto-checked from the official source'}
             {' · last checked '}<strong>{avail?.last_verified || 'recently'}</strong>
           </p>
         ) : (

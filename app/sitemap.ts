@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { getAllServices, getAllCountries, getAvailabilityForService } from '@/lib/db';
 import { buildAvailabilitySlug } from '@/lib/url';
+import { isHighValue } from '@/lib/focus';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://isitavailablein.com';
@@ -39,33 +40,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entries.push({ url: `${base}/apps-banned-in/${c.slug}`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 });
     entries.push({ url: `${base}/best-vpn-for/${c.slug}`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 });
   }
-  for (const s of services) {
-    for (const c of countries) {
-      entries.push({
-        url: `${base}/${buildAvailabilitySlug(s.slug, c.slug)}`,
-        lastModified: now,
-        changeFrequency: 'weekly',
-        priority: 0.5
-      });
-    }
-  }
-
-  // /how-to-use/[service]/[country] — only for blocked/restricted combos.
-  // High priority (0.85) because these are the highest-intent affiliate pages.
-  const countryBySlug = new Map(countries.map((c) => [c.iso2, c.slug]));
+  // Per-service availability, fetched once. Drives BOTH the high-value page
+  // filter and the how-to-use list. We deliberately DON'T emit all 4,670
+  // service×country combos — only pages that say something useful (restricted
+  // status, censored market, real price, or verified data). Thin "available,
+  // nothing to add" filler is left out of the sitemap so Google crawls quality.
+  const countryByIso = new Map(countries.map((c) => [c.iso2, c]));
   for (const s of services) {
     const rows = await getAvailabilityForService(s.id);
     for (const r of rows) {
-      if (r.status === 'no' || r.status === 'partial' || r.status === 'vpn_only') {
-        const cSlug = countryBySlug.get(r.country_iso2);
-        if (cSlug) {
-          entries.push({
-            url: `${base}/how-to-use/${s.slug}/${cSlug}`,
-            lastModified: now,
-            changeFrequency: 'weekly',
-            priority: 0.85,
-          });
-        }
+      const c = countryByIso.get(r.country_iso2);
+      if (!c) continue;
+      const restricted = r.status === 'no' || r.status === 'partial' || r.status === 'vpn_only';
+
+      if (isHighValue({ status: r.status, iso2: r.country_iso2, source: (r as any).source })) {
+        entries.push({
+          url: `${base}/${buildAvailabilitySlug(s.slug, c.slug)}`,
+          lastModified: now,
+          changeFrequency: 'weekly',
+          priority: restricted ? 0.8 : 0.6,
+        });
+      }
+      // How-to-use unblock guide — the highest-intent affiliate pages.
+      if (restricted) {
+        entries.push({
+          url: `${base}/how-to-use/${s.slug}/${c.slug}`,
+          lastModified: now,
+          changeFrequency: 'weekly',
+          priority: 0.85,
+        });
       }
     }
   }

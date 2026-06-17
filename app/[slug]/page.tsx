@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getAllServices, getAllCountries, getService, getCountry, getAvailability, getPricing, getAvailabilityForCountry, getConfirmationCounts, getWorkingMethods } from '@/lib/db';
 import { parseAvailabilitySlug, buildAvailabilitySlug, statusAnswer } from '@/lib/url';
+import { isHighValue } from '@/lib/focus';
 import AdSlot from '@/components/AdSlot';
 import PriceTable from '@/components/PriceTable';
 import VpnCta from '@/components/VpnCta';
@@ -43,8 +44,12 @@ async function resolve(slug: string) {
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const r = await resolve(params.slug);
   if (!r) return { title: 'Not found' };
-  const { service, country, avail } = r;
+  const { service, country, avail, pricing } = r;
   const status = avail?.status || 'unknown';
+  // Index only pages that say something useful (restricted status, censored
+  // market, real price, or verified data). Noindex thin "available, nothing to
+  // add" filler so the site reads as a focused restricted-access resource.
+  const highValue = isHighValue({ status, iso2: country.iso2, source: avail?.source, hasPricing: !!(pricing && pricing.length) });
   const ans = statusAnswer(status);
   const title = `Is ${service.name} available in ${country.name}? (${ans.word})`;
   // Only claim freshness in the search snippet when the row is genuinely
@@ -60,6 +65,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     title,
     description,
     alternates: { canonical: `/${params.slug}` },
+    robots: { index: highValue, follow: true },
     openGraph: { title, description, images: [ogUrl] },
     twitter: { card: 'summary_large_image', title, description, images: [ogUrl] },
   };

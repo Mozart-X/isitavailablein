@@ -12,7 +12,9 @@ on:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # Public repo = unlimited free minutes, so give scrapers room. 10 min was
+    # cutting slow runs off mid-scrape (and would truncate the OONI step).
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

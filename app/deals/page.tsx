@@ -33,16 +33,16 @@ const VPN_DEALS = [
     name: 'Surfshark',
     discount: 'From $2.19/mo',
     headline: 'Surfshark 2-year plan',
-    body: 'Cheapest top-tier VPN. Unlimited devices, includes Surfshark Antivirus + alert.',
-    badge: 'Cheapest',
+    body: 'One of the lowest-priced top-tier VPNs. Unlimited devices, includes Surfshark Antivirus + alert.',
+    badge: 'Best value',
   },
   {
     provider: 'express' as const,
     name: 'ExpressVPN',
     discount: '49% off + 3 months free',
     headline: 'ExpressVPN 1-year plan',
-    body: 'Fastest VPN. 49% off the 12-month plan + 3 extra months free. 30-day refund.',
-    badge: 'Fastest',
+    body: 'Ranks among the fastest in independent speed tests. 49% off the 12-month plan + 3 extra months free. 30-day refund.',
+    badge: 'Top speed',
   },
 ];
 
@@ -93,7 +93,7 @@ export default function DealsPage() {
           <div className="deal-badge">Free signup</div>
           <h3>Wise multi-currency card</h3>
           <div className="deal-discount">Free virtual cards</div>
-          <p>Get a card whose BIN matches a "supported" country. Works at international checkouts where your local card is rejected. Free to open.</p>
+          <p>A free multi-currency account. Its card details are accepted at most international checkouts — useful when a local-only card is declined abroad. Free to open.</p>
           <a href={wise.href} rel="nofollow sponsored noopener" target="_blank" className="deal-cta">
             Open a Wise account →
           </a>
@@ -133,8 +133,8 @@ export default function DealsPage() {
       </p>
       <h3>Can I get a refund if it doesn't work?</h3>
       <p>
-        All three VPNs above offer 30-day money-back guarantees. We've tested them and the
-        refunds are processed without arguing.
+        All three publish a 30-day money-back guarantee, so if it doesn't work for you,
+        you can cancel within that window for a refund.
       </p>
     </article>
   );

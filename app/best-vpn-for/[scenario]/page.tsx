@@ -62,8 +62,9 @@ export default async function Page({ params }: { params: { scenario: string } })
         <p>
           {r.name} uses IP-based and sometimes payment-based geo-detection. A VPN solves the IP
           side: pick a server in a country where {r.name} is fully available, connect, then sign
-          up or log in normally. For payment-restricted services, you'll also need a card whose
-          BIN matches a supported country — see the full stack below.
+          up or log in normally. Some payment-restricted services also check your card's billing
+          region — a multi-currency card can help, though signing up from a region you're not in
+          may breach the service's terms. See the full stack below.
         </p>
       ) : (
         <p>

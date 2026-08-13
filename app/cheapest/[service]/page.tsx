@@ -174,14 +174,14 @@ export default async function Page({ params }: { params: { service: string } }) 
       <h2>Can you actually pay the cheapest country's price?</h2>
       <p>
         Sometimes. Services that bill by your physical IP (some streaming) will block this.
-        Services that bill by your card BIN (many AI tools and subscriptions) will accept any
-        card with a supported country code. The reliable workflow:
+        Services that bill by your card's billing country (many AI tools and subscriptions) may
+        accept a card issued in a supported region. One important caveat: paying from a region
+        you don't live in can violate a service's terms of use — check them first. Broadly:
       </p>
       <ol>
-        <li>VPN to {cheapestAvail?.country_name || 'the cheapest region'} during signup.</li>
-        <li>Pay with a card or virtual card with that country's BIN, or with a multi-currency
-            card that doesn't reveal your home country.</li>
-        <li>Use the service normally — most don't re-check geo after sign-up.</li>
+        <li>Connect to {cheapestAvail?.country_name || 'the cheapest region'} during signup.</li>
+        <li>Pay with a card or multi-currency card issued in a supported region.</li>
+        <li>Use the service normally.</li>
       </ol>
 
       <MoneyStack

@@ -154,7 +154,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main>{children}</main>
         <OutboundTracker />
         <footer className="site-footer">
-          <p><a href="/cheapest">Cheapest country</a> · <a href="/best-vpn-quiz">VPN quiz</a> · <a href="/alerts">Alerts</a> · <a href="/api-docs">API</a></p>
+          <p><a href="/cheapest">Cheapest country</a> · <a href="/best-vpn-quiz">VPN quiz</a> · <a href="/alerts">Alerts</a> · <a href="/api-docs">API</a> · <a href="/business">Business</a></p>
           <p>Not legal advice. <a href="/about">About</a> · <a href="/contact">Contact</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a></p>
           <p className="site-credit">Designed by Abhii 👾</p>
         </footer>

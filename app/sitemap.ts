@@ -18,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/best-vpn`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${base}/deals`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
     { url: `${base}/api-docs`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${base}/business`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${base}/me`, lastModified: now, changeFrequency: 'daily', priority: 0.9 },
     { url: `${base}/alerts`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${base}/best-vpn-quiz`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },

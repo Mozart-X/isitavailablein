@@ -67,6 +67,21 @@ export default async function HomePage() {
         </section>
       )}
 
+      <section className="api-promo">
+        <h2>Need this data programmatically?</h2>
+        <p>
+          Every service × country availability row — with source and confidence — is
+          available as a free JSON/CSV REST API. Power compliance checks, regional
+          feature flags, or an AI assistant that answers “is ChatGPT available in …”.
+        </p>
+        <pre className="api-promo-code">GET /api/v1/availability?service=chatgpt&amp;country=NP</pre>
+        <p>
+          <a href="/api-docs" className="api-promo-cta">Read the API docs →</a>
+          {'  '}
+          <a href="/business">For SaaS &amp; compliance teams →</a>
+        </p>
+      </section>
+
       <SuggestForm />
     </>
   );

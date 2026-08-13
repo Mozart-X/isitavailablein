@@ -302,6 +302,13 @@ tbody tr:hover { background: var(--surface-2); }
 .finder-quick-links a:hover { text-decoration: underline; }
 @media (max-width: 600px) { .finder-inline { padding: 0.8rem; } .finder-inline select { flex-basis: 100%; } .finder-inline button { width: 100%; } }
 
+/* ---------- API promo (homepage) ---------- */
+.api-promo { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 1.5rem 1.75rem; margin: 2.25rem 0; }
+.api-promo h2 { margin-top: 0; }
+.api-promo p { color: var(--ink-2); font-size: 0.98rem; }
+.api-promo-code { display: block; background: var(--ink); color: #f0f0ee; padding: 0.85rem 1rem; border-radius: var(--r); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9rem; overflow-x: auto; margin: 1rem 0; white-space: pre; }
+.api-promo-cta { font-weight: 600; }
+
 /* ---------- Info cards ---------- */
 .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
 .info-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 0.9rem 1rem; }

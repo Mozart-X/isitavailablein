@@ -9,6 +9,35 @@ import { buildAvailabilitySlug } from '@/lib/url';
 
 type Lite = { slug: string; name: string; category?: string; iso2?: string; flag?: string };
 
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+    dataLayer?: any[];
+  }
+}
+
+// Fire a GA4 event when someone actually USES the finder. Without this, every
+// real interaction is invisible — the user selects + submits, the page
+// navigates away, and GA4 only records a ~4s "bounce" on the homepage. This is
+// the difference between "486 users who bounced" and "N users who ran a query".
+function trackCheck(service: string, country: string, resolved: string) {
+  try {
+    (window.dataLayer = window.dataLayer || []).push({
+      event: 'availability_check',
+      check_service: service || '(none)',
+      check_country: country || '(none)',
+      check_resolved: resolved,
+    });
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'availability_check', {
+        service: service || '(none)',
+        country: country || '(none)',
+        resolved,
+      });
+    }
+  } catch {}
+}
+
 export default function Finder({ services, countries }: { services: Lite[]; countries: Lite[] }) {
   const [service, setService] = useState('');
   const [country, setCountry] = useState('');
@@ -25,10 +54,13 @@ export default function Finder({ services, countries }: { services: Lite[]; coun
   function submit(e: React.FormEvent) {
     e.preventDefault();
     if (service && country) {
+      trackCheck(service, country, 'availability');
       window.location.href = `/${buildAvailabilitySlug(service, country)}`;
     } else if (service) {
+      trackCheck(service, country, 'service');
       window.location.href = `/service/${service}`;
     } else if (country) {
+      trackCheck(service, country, 'country');
       window.location.href = `/country/${country}`;
     }
   }

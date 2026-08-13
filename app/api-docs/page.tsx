@@ -63,7 +63,8 @@ curl 'https://isitavailablein.com/api/v1/availability?country=CN&status=no&forma
     "count": 1,
     "limit": 500,
     "generated_at": "2026-05-23T...",
-    "docs": "https://isitavailablein.com/api-docs"
+    "docs": "https://isitavailablein.com/api-docs",
+    "free_tier_limit": "1000 req/day per IP"
   },
   "filters": { "service": "chatgpt", "country": "CN", "status": null, "format": "json" },
   "data": [
@@ -79,7 +80,8 @@ curl 'https://isitavailablein.com/api/v1/availability?country=CN&status=no&forma
       "phone_verify_ok": null,    // yes | no | workaround | null
       "workaround": null,         // free-text instruction
       "last_verified": "2026-04-22",
-      "source": "openai-official"
+      "source": "openai-official",       // raw provenance string
+      "source_type": "official_scraped"  // official_scraped | curated | baseline-seed | unknown
     }
   ]
 }`}
@@ -108,7 +110,8 @@ curl 'https://isitavailablein.com/api/v1/availability?country=CN&status=no&forma
       <p>
         Need higher rate limits, an SLA, historical data, change webhooks, or a
         signed data dump for compliance audit? We're rolling out a paid tier
-        for fintech / SaaS teams who need authoritative service-availability data.
+        for fintech / SaaS teams who need first-party-sourced, SLA-backed
+        service-availability data.
       </p>
       <ul>
         <li><strong>Standard</strong> — 100k req/day, 99.9% SLA, change webhooks. From <strong>$199/mo</strong>.</li>

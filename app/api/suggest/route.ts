@@ -49,6 +49,25 @@ const SPAM_EMAIL_DOMAINS = [
   'briannawebsolution',
   'joriggsvideo',
   'search-isitavailablein',
+  'henrydixon487',
+  'halitaandrew160',
+];
+
+// "What's your price?" contact-form spam wave. Bots rotate obscure languages
+// (Icelandic, Basque, Irish, Latvian, ...) with no URL, no service and no
+// context, specifically to slip keyword filters and bait a reply. These are
+// NON-English fragments only — a genuine English buyer asking about pricing is
+// never caught here (repeat address reuse is handled separately in POST).
+const FOREIGN_PRICE_SPAM = [
+  'verð þitt', 'vita verð',                 // Icelandic
+  'zure prezioa', 'prezioa jakin',          // Basque
+  'phraghas', 'do phraghas',                // Irish
+  'zināt savu cenu', 'savu cenu',           // Latvian
+  'saber su precio', 'conocer su precio',   // Spanish
+  'connaître votre prix', 'savoir votre prix', 'connaitre votre prix', // French
+  'ihren preis', 'euren preis',             // German
+  'vostro prezzo', 'sapere il prezzo',      // Italian
+  'seu preço', 'vosso preço',               // Portuguese
 ];
 
 // Quoting back the site's own domain is a tell-tale of a templated mass email.
@@ -68,6 +87,10 @@ function looksLikeSpam(body: string, contact: string | null): string | null {
   // Legit user feedback talks about a feature/service, not about us.
   for (const p of SELF_REFERENCE_PATTERNS) {
     if (b.includes(p)) return `self_ref:${p}`;
+  }
+  // Multilingual "what's your price" spam templates (non-English only).
+  for (const p of FOREIGN_PRICE_SPAM) {
+    if (b.includes(p)) return `price_spam:${p}`;
   }
   // Count distinct URL-like tokens (https://foo or www.foo).
   // Contact form bodies don't need links; >= 2 = almost certainly spam.
@@ -146,6 +169,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.redirect((req.headers.get('referer') || '/') + '?suggested=1', 303);
     }
   } catch {}
+
+  // --- ANTI-SPAM LAYER 5: Repeat sender with a short, generic body ---
+  // The "what's your price" campaign reuses the same Gmail across weeks, each
+  // time in a different language. If this contact already submitted before and
+  // the body is short with no link, it's the same bot — drop it. A genuine
+  // first-time buyer (no prior row) is never affected.
+  if (contact && body.length < 120 && !/https?:\/\//i.test(body)) {
+    try {
+      const prior = await queryRaw(
+        `SELECT 1 FROM suggestions WHERE lower(contact) = lower(?) LIMIT 1`,
+        [contact]
+      );
+      if (prior.length > 0) {
+        return NextResponse.redirect((req.headers.get('referer') || '/') + '?suggested=1', 303);
+      }
+    } catch {}
+  }
 
   await exec(
     `INSERT INTO suggestions (kind, body, contact, ip_hash) VALUES (?, ?, ?, ?)`,
